@@ -1,0 +1,58 @@
+name: eval-gate
+
+# 评估门禁骨架（Phase 0）。当前仅做结构与配置校验；
+# Phase 2 起接入 src/eval/ 的 golden_set 全量合成与 Q1–Q10 门禁。
+# 阈值单一真源：configs/eval/thresholds.yaml
+
+on:
+  pull_request:
+    paths:
+      - "configs/eval/**"
+      - "configs/presets/**"
+      - "src/**"
+      - "tests/regression/**"
+      - "docs/model-cards/**"
+  push:
+    branches: [main]
+    paths:
+      - "configs/eval/**"
+      - "src/**"
+
+permissions:
+  contents: read
+
+jobs:
+  config-validate:
+    name: 阈值与配置结构校验（Phase 0 骨架）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装最小依赖
+        run: python -m pip install --quiet pyyaml
+
+      - name: 校验 thresholds.yaml 结构
+        run: |
+          python - <<'PY'
+          import sys, yaml, pathlib
+          p = pathlib.Path("configs/eval/thresholds.yaml")
+          if not p.exists():
+              sys.exit("::error::缺少 configs/eval/thresholds.yaml")
+          d = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+          required = {"version", "hard", "soft"}
+          missing = required - set(d)
+          if missing:
+              sys.exit(f"::error::thresholds.yaml 缺少顶层键: {sorted(missing)}")
+          for cat in ("hard", "soft"):
+              if not isinstance(d[cat], dict) or not d[cat]:
+                  sys.exit(f"::error::{cat} 必须为非空映射")
+          print("thresholds.yaml 结构校验通过。")
+          print("提示：Phase 2 起接入 golden_set 全量合成与 Q1–Q10 自动门禁。")
+          PY
+
+      - name: 提示（未接入真实门禁）
+        run: echo "::notice::eval-gate 当前为 Phase 0 骨架，尚未运行真实合成门禁。"

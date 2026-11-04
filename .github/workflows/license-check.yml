@@ -1,0 +1,98 @@
+name: license-check
+
+# 保证「开放权重 + 非商业许可」的条款、归因与上游声明不被无意破坏。
+# 详见 COMMIT_CONVENTION.md §6 与 docs/licensing/UPSTREAM-LICENSE-MATRIX.md
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  license-check:
+    name: 许可与归因合规检查
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: LICENSE 完整性（PolyForm NC 1.0.0 官方原文）
+        run: |
+          set -euo pipefail
+          if [ ! -f LICENSE ]; then
+            echo "::error::缺少 LICENSE"; exit 1
+          fi
+          grep -q "PolyForm Noncommercial License 1.0.0" LICENSE \
+            || { echo "::error::LICENSE 不是 PolyForm Noncommercial 1.0.0"; exit 1; }
+          grep -q "polyformproject.org/licenses/noncommercial/1.0.0" LICENSE \
+            || { echo "::error::LICENSE 缺少官方 URL"; exit 1; }
+          grep -q "Required Notice:" LICENSE \
+            || { echo "::error::LICENSE 缺少 Notices 条款"; exit 1; }
+          grep -q "32 days" LICENSE \
+            || { echo "::error::LICENSE 缺少 Violations 条款"; exit 1; }
+          echo "LICENSE 完整性检查通过（禁止改写官方原文）。"
+
+      - name: NOTICE 必需声明
+        run: |
+          set -euo pipefail
+          grep -q "^Required Notice:" NOTICE \
+            || { echo "::error::NOTICE 缺少 Required Notice: 行（PolyForm Notices 条款要求）"; exit 1; }
+          grep -q "PolyForm Noncommercial" NOTICE || { echo "::error::NOTICE 缺少许可标识"; exit 1; }
+          grep -q "LICENSE-COMMERCIAL.md" NOTICE || { echo "::error::NOTICE 缺少商业授权入口"; exit 1; }
+          echo "NOTICE 检查通过。"
+
+      - name: 受保护路径变更需显式声明
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          changed="$(git diff --name-only "${BASE_SHA}..${HEAD_SHA}")"
+
+          # golden_set 绝对冻结：任何改动直接失败
+          if printf '%s' "$changed" | grep -q '^datasets/golden_set/'; then
+            echo "::error::datasets/golden_set/** 为冻结回归集，禁止修改（含新增/删除）。"
+            exit 1
+          fi
+
+          # 许可文件变更必须在 PR 中标注法务批准人
+          if printf '%s' "$changed" | grep -qE '^(LICENSE|NOTICE|LICENSE-COMMERCIAL\.md)$'; then
+            msg="$(git log --format='%B' "${BASE_SHA}..${HEAD_SHA}")"
+            printf '%s' "$msg" | grep -qi 'License-Review:' \
+              || { echo "::error::许可文件变更需 License-Review: footer 与法务批准（见 COMMIT_CONVENTION.md §5/§6）"; exit 1; }
+          fi
+          echo "受保护路径检查通过。"
+
+      - name: 新增第三方依赖 / 基座 / 数据集须声明许可
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          changed="$(git diff --name-only "${BASE_SHA}..${HEAD_SHA}")"
+          # 新增模型卡、manifest、依赖锁文件时，必须带 License: 声明
+          risky="$(printf '%s' "$changed" | grep -E '^(docs/model-cards/.*\.md|datasets/manifests/.*\.yaml|locks/.*|configs/base/.*\.yaml)$' || true)"
+          if [ -n "$risky" ]; then
+            msg="$(git log --format='%B' "${BASE_SHA}..${HEAD_SHA}")"
+            printf '%s' "$msg" | grep -qi 'License:' \
+              || { echo "::error::新增依赖/权重/数据集须在提交 footer 声明 License: <spdx>，并同步更新 NOTICE 与 UPSTREAM-LICENSE-MATRIX.md"; exit 1; }
+          fi
+          echo "新增声明检查通过。"
+
+      - name: 仓库内禁止二进制音频与常见凭据文件
+        run: |
+          set -euo pipefail
+          bad="$(git ls-files | grep -iE '\.(wav|mp3|flac|ogg|m4a|opus|pcm|bin|ckpt|pt|pth|safetensors)$|\.env($|\.)|id_rsa|\.pem$' || true)"
+          if [ -n "$bad" ]; then
+            echo "::error::仓库不应包含音频实体/权重/凭据文件："
+            printf '%s\n' "$bad"
+            exit 1
+          fi
+          echo "文件类型检查通过（音频/权重走 DVC 或对象存储）。"

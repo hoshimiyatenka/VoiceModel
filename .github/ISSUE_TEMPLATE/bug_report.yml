@@ -1,0 +1,44 @@
+name: 缺陷报告
+description: 报告 VoiceModel 的缺陷（请先用搜索确认未重复）
+title: "fix(<scope>): "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提交 issue 前请确认：不含密钥/token、不含音频实体或个人信息。
+        提交信息规范见 COMMIT_CONVENTION.md。
+  - type: input
+    id: scope
+    attributes:
+      label: 影响 scope
+      placeholder: "control / serve / eval / train / data / ..."
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: 预期行为 / 实际行为
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      description: "含 preset 版本、模型 commit、seed、依赖锁；不要粘贴密钥"
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: 环境
+      placeholder: "OS / GPU / torch / CUDA / 模型版本"
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 确认
+      options:
+        - label: 未包含任何凭据、音频实体或个人信息
+          required: true
+        - label: 已阅读 README 的许可摘要与 CONTRIBUTING.md
+          required: true

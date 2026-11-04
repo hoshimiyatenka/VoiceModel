@@ -1,0 +1,131 @@
+VoiceModel — NOTICE / 归因与权利保留声明
+========================================
+
+Required Notice: Copyright 2026 VoiceModel Project (https://github.com/hoshimiyatenka/VoiceModel)
+
+本文件随本项目的一切分发副本一并提供，满足 PolyForm Noncommercial
+License 1.0.0 的 "Notices" 条款要求。请不要从任何副本中删除本文件。
+
+
+1. 本项目许可摘要（非法律文本，以 LICENSE 为准）
+------------------------------------------------
+- 本项目公开全部源代码与模型权重，采用
+  PolyForm Noncommercial License 1.0.0（详见仓库根目录 LICENSE）。
+- 允许：研究、个人学习/实验/测试、非商业组织、公益/教育/政府用途、
+  以及法律赋予的合理使用。
+- 需要单独书面授权：任何商业目的使用，包括但不限于嵌入付费产品、
+  提供语音生成 API / 托管服务、企业内部业务运营、直接或间接产生收入
+  的用途。申请入口见 LICENSE-COMMERCIAL.md。
+- 本项目对外表述为「开放权重 / 源码可得（source-available）」，
+  不是 OSI 认证的 Open Source：OSI 定义第 6 条禁止按用途领域歧视，
+  因此「允许商用」的 OSI 许可无法同时实现「禁止商业化」。
+
+- 权利保留：版权持有人保留向特定主体单独授予商业许可的权利
+  （双授权 / dual licensing）。PolyForm NC 1.0.0 的 "No Other Rights"
+  条款不阻止 licensor 自行向他人另行授权。
+
+
+2. 许可覆盖范围（重要，避免夸大）
+--------------------------------
+本项目的 NC 条款只覆盖「本项目自有增量」，不覆盖、也不能撤销上游
+权利人已授予的权利：
+
+  · 上游基座模型权重（依其自身许可，如 Apache-2.0）仍可由第三方
+    按其原始条款使用；
+  · NC 条款实际覆盖：本项目的训练/推理/控制层代码、VoiceSpec 契约、
+    preset 与配置、发音词典、数据标注与质检流程、golden_set、
+    LoRA / adapter / 微调后权重、模型卡、文档与评测报告、预设音色
+    资产。
+
+完整传导分析见 docs/licensing/UPSTREAM-LICENSE-MATRIX.md。
+
+
+3. 上游归因清单（核验日期 2026-11-04）
+--------------------------------------
+下列第三方组件仅在其自身许可下被引用/集成；其版权归各自权利人所有。
+分发含这些组件的衍生作品时，须一并保留各自的许可与归因声明。
+
+3.1 宽松许可（Apache-2.0 / MIT / BSD / MPL，已核验 LICENSE 原文）
+  - QwenAudio/CosyVoice (CosyVoice / CosyVoice 2) — Apache-2.0
+    https://github.com/QwenAudio/CosyVoice
+    论文 arXiv:2407.05407 / arXiv:2412.10117
+  - QwenLM/Qwen3-TTS — Apache-2.0（权重卡 apache-2.0）
+    https://github.com/QwenLM/Qwen3-TTS
+  - OpenBMB/VoxCPM (VoxCPM / VoxCPM2) — Apache-2.0
+    https://github.com/OpenBMB/VoxCPM   论文 arXiv:2509.24650
+  - SWivid/F5-TTS — MIT    https://github.com/SWivid/F5-TTS
+    论文 arXiv:2410.06885
+  - RVC-Boss/GPT-SoVITS — MIT    https://github.com/RVC-Boss/GPT-SoVITS
+  - NVIDIA/BigVGAN — MIT    https://github.com/NVIDIA/BigVGAN
+    论文 arXiv:2206.04658 (ICLR 2023)
+  - jik876/hifi-gan (HiFi-GAN) — 见 upstream matrix
+    论文 arXiv:2010.05646 (NeurIPS 2020)
+  - openai/whisper — MIT    https://github.com/openai/whisper
+    论文 arXiv:2212.04356
+  - m-bain/whisperX — BSD-2-Clause    https://github.com/m-bain/whisperX
+    论文 arXiv:2303.00747 (INTERSPEECH 2023)
+  - MontrealCorpusTools/Montreal-Forced-Aligner — MIT
+  - modelscope/FunASR — MIT    https://github.com/modelscope/FunASR
+    论文 arXiv:2305.11013
+  - speechbrain/speechbrain — Apache-2.0
+    ECAPA-TDNN arXiv:2005.07143 (INTERSPEECH 2020)
+  - wenet-e2e/wenet — Apache-2.0    论文 arXiv:2102.01547
+  - facebookresearch/audioseal — MIT
+    论文 arXiv:2401.17264 (ICML 2024)
+  - coqui-ai/TTS — MPL-2.0（弱互惠，注意文件级 copyleft）
+
+3.2 自定义 / 受限许可（须逐项法务确认后方可集成）
+  - index-tts/index-tts (IndexTTS2) — bilibili Model Use License Agreement
+    论文 arXiv:2506.21619    https://github.com/index-tts/index-tts
+    要点：MAU > 1 亿或上年营收 > RMB 10 亿须单独授权；不得用于改进
+    其他 AI 模型（除自身衍生作品或非商业 AI 模型）。
+  - fishaudio/fish-speech — Fish Audio Community License v1.0 (2026-10-13)
+    https://github.com/fishaudio/fish-speech
+    要点：年营收 < USD 500,000 才有限商用；Hosted Service 一律禁止；
+    禁止用输出训练/蒸馏其他基础语音模型；须保留 "Built with Fish Audio"。
+  - SparkAudio/Spark-TTS — 代码 Apache-2.0，
+    权重 CC-BY-NC-SA-4.0（"can only be used for non-commercial purposes"）
+    论文 arXiv:2503.01710    https://github.com/SparkAudio/Spark-TTS
+    本项目仅参考其属性级控制方法，不采用其权重作为发布基座
+    （见 docs/decisions/ADR-0001.md）。
+  - 数据集 AISHELL-3 / WenetSpeech / ESD / CASIA / EmoV-DB / Common Voice
+    等：仅用于流水线验证或评测对照，各自许可证与商用范围须逐项核验。
+
+> 上游许可证矩阵（含核验命令与传导分析）：
+> docs/licensing/UPSTREAM-LICENSE-MATRIX.md
+> 权威论文清单：docs/references/PAPERS.md
+
+
+4. 使用限制（伦理与合规，与许可条款并行）
+------------------------------------------
+- 不得在未经本人书面同意的情况下克隆可识别自然人的声音；
+  未成年人须监护人同意，已故者须权利持有人同意。
+- 不得用于冒充、欺诈、骚扰、违法电话营销，或生成违法内容。
+- 不得故意移除、禁用、规避或遮蔽本项目注入的水印/溯源信号
+  （AudioSeal，arXiv:2401.17264；RenderSpec.watermark 默认 true）。
+  普通编辑、混音、压缩、格式转换若非以去水印为目的，不视为违反。
+- 若向第三方再分发本项目或其衍生作品，须以同等保护力的条款约束
+  该第三方遵守上述限制。
+- 对外交付的音频与接口须明确标注「AI 合成」。
+
+
+5. 商标
+--------
+本许可不授予任何商标权。不得使用上游项目或本项目的名称/标识暗示
+官方背书、赞助或认证，但为说明来源而作真实、事实性引用除外。
+
+
+6. 无担保
+----------
+按 LICENSE "No Liability" 条款，软件与模型按「现状」提供，
+不含任何明示或默示担保。使用者自行判断使用与再分发的合法性并承担风险。
+
+
+7. 联系
+--------
+- 商业授权：见 LICENSE-COMMERCIAL.md
+- 许可/归因问题：见仓库 CONTRIBUTING.md 中的联系入口
+- 侵权与滥用举报：见仓库 README.md
+
+本文件若与 LICENSE 冲突，以 LICENSE 为准；LICENSE 官方原文位于
+https://polyformproject.org/licenses/noncommercial/1.0.0

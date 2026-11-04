@@ -1,0 +1,69 @@
+# ---- 音频实体 / 权重 / 数据集（走 DVC 或对象存储，禁止入库）----
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.m4a
+*.opus
+*.aac
+*.pcm
+*.bin
+*.ckpt
+*.pt
+*.pth
+*.safetensors
+*.onnx
+*.gguf
+artifacts/
+datasets/raw/
+datasets/processed/
+!datasets/manifests/
+!datasets/golden_set/manifest.yaml
+
+# ---- 凭据 / 密钥 / 个人信息 ----
+.env
+.env.*
+*.pem
+*.key
+id_rsa
+id_ed25519
+*_secret*
+credentials*
+!*credentials.example*
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# ---- 实验与日志 ----
+experiments/runs/
+wandb/
+mlruns/
+*.log
+!CHANGELOG.md
+
+# ---- 编辑器 / OS ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- DVC（保留 .dvc 指针与配置）----
+.dvc/cache/
+.dvc/tmp/
+!.dvc/config
+!*.dvc
+
+# ---- Node（commitlint / commitizen 本地依赖）----
+node_modules/
+.npm/
+package-lock.json

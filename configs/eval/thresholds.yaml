@@ -1,0 +1,69 @@
+# 评估门禁阈值 —— 单一真源
+# ---------------------------------------------------------------------------
+# 本文件是 Q1–Q10 全部阈值的唯一定义处。代码、文档、CI 均引用本文件，
+# 禁止在别处硬编码数字。修改需用 eval(gates) 提交并附 Gate-Report: footer。
+#
+# 状态：Phase 0 目标门禁（未经实测校准）。Phase 2 用固定回归集实测后校准，
+# 校准只能收紧；如需放宽必须书面说明理由并经评审（见技术栈方案 v0.2 §8）。
+# ---------------------------------------------------------------------------
+
+version: "0.2.0"
+calibration:
+  status: uncalibrated
+  calibrated_at: null
+  baseline_report: null
+  note: "Phase 2 用 golden_set v1 实测后回填；在此之前所有数值均为目标值，不代表实测结果。"
+
+# 硬指标：任一不通过即阻断，禁止进入人工评测
+hard:
+  cer_zh_max: 0.03                 # Q1 中文 CER ≤ 3%（固定 ASR 回环）
+  wer_en_max: 0.05                 # Q1 英文 WER ≤ 5%
+  speaker_cosine_min: 0.82         # Q2 与目标参考的 ECAPA-TDNN cosine
+  speaker_cosine_cross_max: 0.70   # Q2 不同说话人间上限
+  dnsmos_min: 3.2                  # Q4 音质
+  clipping_count_max: 0            # Q4 削波样本数
+  duration_exact_abs_ms: 50        # Q6 exact 模式绝对误差
+  duration_exact_ratio: 0.02       # Q6 exact 模式相对误差（取两者较大者）
+  regression_sentences: 1000       # Q8 回归句数
+  regression_crash_max: 0          # Q8 crash / 空音频 / 乱码
+  waveform_reproducible: true      # Q9 byte-level 一致
+  param_scan_cosine_drift_max: 0.03 # Q10 单参数扫描说话人漂移
+  param_scan_utmos_drop_max: 0.30  # 参数扫描音质下降上限
+  param_scan_cer_rise_max_pp: 0.01 # 参数扫描 CER 上升上限（百分点）
+
+# 软指标：需评审，不自动阻断；F3 验收后部分转硬
+soft:
+  mos_min: 4.0                     # Q3 主观 MOS (1–5)
+  utmos_min: 3.8                   # Q3 客观自然度代理
+  emotion_acc_min: 0.85            # Q5 情感分类准确率
+  emotion_monotonic_rho_min: 0.90  # Q5 连续强度 Spearman ρ
+  param_monotonic_rho_min: 0.90    # 参数扫描单调性
+  first_packet_p95_ms: 300         # Q7 流式首包延迟
+  rtf_max: 0.3                     # Q7 Real-Time Factor
+
+# 参数扫描配置（见方案 v0.1 §5.6 / v0.2 §5.3）
+param_scan:
+  points: 5                        # 含默认值共 5 点
+  texts_per_point: 20              # 每点固定 20 条文本
+  fixed_seed: 20261104
+  listeners_for_jump_check: 3      # 相邻档位「风格跳变」听审人数
+
+# 主观评测（按 VoiceMOS Challenge 2022, arXiv:2203.11389）
+subjective:
+  listeners_min: 20
+  samples_per_round_min: 40
+  hidden_anchors: true
+  repeated_items: true
+  report_confidence: 0.95
+  cmos_ci_must_not_cross_zero: true
+
+# 指标来源（论文依据，见 docs/references/PAPERS.md）
+metrics_sources:
+  cer: "ASR 回环：Whisper arXiv:2212.04356 / Paraformer arXiv:2206.08317 / FunASR arXiv:2305.11013"
+  speaker_cosine: "ECAPA-TDNN arXiv:2005.07143 (INTERSPEECH 2020)"
+  mos: "VoiceMOS Challenge arXiv:2203.11389"
+  utmos: "UTMOS arXiv:2204.02152 (INTERSPEECH 2022)"
+  dnsmos: "DNSMOS arXiv:2010.15258 (ICASSP 2020)"
+  speechbertscore: "SpeechBERTScore arXiv:2401.16812"
+  dpo: "DPO arXiv:2305.18290"
+  watermark: "AudioSeal arXiv:2401.17264 (ICML 2024)"

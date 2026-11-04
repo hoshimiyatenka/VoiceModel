@@ -1,0 +1,106 @@
+name: commitlint
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  commitlint:
+    name: 校验提交信息
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: 安装 commitlint
+        run: npm install --no-save @commitlint/cli@19 @commitlint/config-conventional@19
+
+      - name: 校验 PR 内全部提交
+        if: github.event_name == 'pull_request'
+        run: |
+          npx commitlint \
+            --from "${{ github.event.pull_request.base.sha }}" \
+            --to "${{ github.event.pull_request.head.sha }}" \
+            --config .commitlintrc.yml \
+            --verbose
+
+      - name: 校验 PR 标题（squash 场景）
+        if: github.event_name == 'pull_request'
+        run: |
+          printf '%s' "${{ github.event.pull_request.title }}" \
+            | npx commitlint --config .commitlintrc.yml --verbose
+
+      - name: 校验 push 到 main 的提交
+        if: github.event_name == 'push'
+        run: |
+          # 用 stdin 方式，兼容仓库首个提交（无 HEAD~1）
+          git log -1 --format=%B | npx commitlint --config .commitlintrc.yml --verbose
+
+  # 按改动路径校验强制 footer（commitlint 原生不支持，单独实现）
+  required-footers:
+    name: 校验强制 Footer
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 检查改动路径与对应 footer
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -euo pipefail
+          msg="$(git log --format='%B' "${BASE_SHA}..${HEAD_SHA}")"
+          prbody="${PR_BODY}"
+          all="${msg}
+          ${prbody}"
+          changed="$(git diff --name-only "${BASE_SHA}..${HEAD_SHA}")"
+          fail=0
+
+          need() {
+            if ! printf '%s' "$all" | grep -qi "$1"; then
+              echo "::error::缺少必需的 footer/声明: $1 （触发路径: $2）"
+              fail=1
+            fi
+          }
+
+          if printf '%s' "$changed" | grep -qE '^(LICENSE|NOTICE|LICENSE-COMMERCIAL\.md)$'; then
+            need 'License-Review:' 'LICENSE / NOTICE / LICENSE-COMMERCIAL.md'
+          fi
+          if printf '%s' "$changed" | grep -q '^configs/presets/'; then
+            need 'Gate-Report:' 'configs/presets/**'
+            need 'Preset:' 'configs/presets/**'
+          fi
+          if printf '%s' "$changed" | grep -q '^dicts/'; then
+            need 'Gate-Report:' 'dicts/**'
+          fi
+          if printf '%s' "$changed" | grep -q '^configs/eval/thresholds.yaml$'; then
+            need 'Gate-Report:' 'configs/eval/thresholds.yaml'
+          fi
+          if printf '%s' "$changed" | grep -q '^datasets/'; then
+            need 'Dataset:' 'datasets/**'
+          fi
+          if printf '%s' "$changed" | grep -q '^docs/model-cards/'; then
+            need 'Model:' 'docs/model-cards/**'
+            need 'License:' 'docs/model-cards/**'
+          fi
+
+          if [ "$fail" -ne 0 ]; then
+            echo "::error::提交信息 footer 不符合 COMMIT_CONVENTION.md §5，请补齐后重新提交。"
+            exit 1
+          fi
+          echo "强制 footer 校验通过。"

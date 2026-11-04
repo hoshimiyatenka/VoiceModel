@@ -1,0 +1,60 @@
+name: 模型卡 / 权重发布登记
+description: 登记新 checkpoint / adapter 的发布（触发 license-check 与门禁）
+title: "model(model): "
+labels: ["model", "license-check"]
+body:
+  - type: input
+    id: model_id
+    attributes:
+      label: Model ID
+      placeholder: "cv2-lora-20261104-s1200"
+    validations:
+      required: true
+  - type: input
+    id: base
+    attributes:
+      label: 上游基座与 commit
+      placeholder: "QwenAudio/CosyVoice@<commit>"
+    validations:
+      required: true
+  - type: input
+    id: base_license
+    attributes:
+      label: 上游权重许可（SPDX）
+      placeholder: "apache-2.0"
+    validations:
+      required: true
+  - type: input
+    id: derivative_license
+    attributes:
+      label: 本项目衍生许可
+      value: "PolyForm-Noncommercial-1.0.0"
+    validations:
+      required: true
+  - type: textarea
+    id: dataset
+    attributes:
+      label: 数据集与授权
+      description: "Dataset: ds-YYYYMMDD-x；每条 manifest 须含 license_id 与授权文件 hash"
+    validations:
+      required: true
+  - type: textarea
+    id: gate
+    attributes:
+      label: 门禁报告
+      description: "Gate-Report: <id>；须含 Q1–Q10 结果与参数扫描结论"
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 发布前确认
+      options:
+        - label: 已同步 NOTICE 与 UPSTREAM-LICENSE-MATRIX.md
+          required: true
+        - label: 已跑 leak_guard 且 ok=true
+          required: true
+        - label: 权重未入库（走 DVC / 对象存储 / HF）
+          required: true
+        - label: 已获 D11 法务批准（发布权重前）
+          required: true

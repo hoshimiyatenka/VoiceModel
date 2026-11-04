@@ -1,0 +1,24 @@
+# CODEOWNERS —— 受保护路径
+# 与 COMMIT_CONVENTION.md §6 / CONTRIBUTING.md §6 一致。
+# 许可类变更需法务 + 2 maintainer 批准（GitHub 侧另配 branch protection）。
+
+# 许可与权利保留（法务复核 + 双人批准）
+/LICENSE                          @hoshimiyatenka
+/NOTICE                           @hoshimiyatenka
+/LICENSE-COMMERCIAL.md            @hoshimiyatenka
+/docs/licensing/                  @hoshimiyatenka
+/docs/decisions/ADR-0001.md       @hoshimiyatenka
+
+# 冻结回归集（CI 校验 hash，任何改动直接失败）
+/datasets/golden_set/             @hoshimiyatenka
+
+# 参数契约与门禁（maintainer 批准 + Gate-Report）
+/configs/presets/                 @hoshimiyatenka
+/configs/eval/thresholds.yaml     @hoshimiyatenka
+/dicts/                           @hoshimiyatenka
+
+# 提交规范本身
+/COMMIT_CONVENTION.md             @hoshimiyatenka
+/.commitlintrc.yml                @hoshimiyatenka
+/CONTRIBUTING.md                  @hoshimiyatenka
+/.github/workflows/               @hoshimiyatenka

@@ -1,0 +1,83 @@
+# commitlint 配置 —— 与 COMMIT_CONVENTION.md 保持一致
+# 规范变更时必须同步更新本文件与 .github/workflows/commitlint.yml
+
+extends:
+  - "@commitlint/config-conventional"
+
+rules:
+  # type 必须属于项目定制枚举（不得自造）
+  type-enum:
+    - 2
+    - always
+    - - feat
+      - fix
+      - docs
+      - model
+      - voice
+      - data
+      - eval
+      - train
+      - perf
+      - refactor
+      - test
+      - build
+      - ci
+      - chore
+      - license
+      - revert
+  type-case: [2, always, lower-case]
+  type-empty: [2, never]
+
+  # scope 必须属于项目枚举
+  scope-enum:
+    - 2
+    - always
+    - - control
+      - prosody
+      - style
+      - linguistic
+      - render
+      - preset
+      - speaker
+      - frontend
+      - dataset
+      - golden-set
+      - train
+      - model
+      - serve
+      - api
+      - stream
+      - eval
+      - metrics
+      - gates
+      - license
+      - notice
+      - deps
+      - ci
+      - docs
+      - refs
+  scope-case: [2, always, lower-case]
+  scope-empty: [2, never]
+
+  # subject：祈使句、无句号、长度 72
+  subject-case: [0]           # 中文不适用大小写规则，关闭
+  subject-full-stop: [2, never, "."]
+  subject-empty: [2, never]
+  subject-max-length: [2, always, 72]
+  subject-exclamation-mark: [2, never]
+
+  # header / body / footer
+  header-max-length: [2, always, 100]
+  body-leading-blank: [2, always]
+  body-max-line-length: [2, always, 100]
+  footer-leading-blank: [2, always]
+  footer-max-line-length: [2, always, 200]
+
+  # 强制 footer 由 .github/workflows/commitlint.yml 的 license-check 脚本校验
+  # （commitlint 原生不校验「按改动路径必须存在某 footer」，故放在 CI）
+
+  # 引用与 BREAKING CHANGE
+  references-empty: [0]
+  signed-off-by: [0]
+
+helpUrl: "https://github.com/hoshimiyatenka/VoiceModel/blob/main/COMMIT_CONVENTION.md"
