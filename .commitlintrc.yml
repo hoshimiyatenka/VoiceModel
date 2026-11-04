@@ -56,6 +56,7 @@ rules:
       - ci
       - docs
       - refs
+      - implement
   scope-case: [2, always, lower-case]
   scope-empty: [2, never]
 

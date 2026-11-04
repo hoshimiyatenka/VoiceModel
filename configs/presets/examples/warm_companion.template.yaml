@@ -1,0 +1,35 @@
+# 模板 / Phase 0 / 非实测 / 状态: template / 不得标 production
+# v0.4 模板 / Phase 0 / 非实测 / 状态: template
+# 温柔陪伴场景的最小合法 VoiceSpec 片段（preset 默认值集合）。
+# 字段名严格来自 configs/voicespec/voicespec.schema.json 的 properties；
+# spec_version 若写必须恰为 "0.3.0"（v0.4 不升契约版本）。
+# 注意：ProsodySpec.not 禁止 rate 与任何 duration_*/duration_mode=exact|range 同时显式出现，
+# 故本模板不含任何 duration 字段。Phase 0 无实测，所有参数为示例占位默认值。
+# 许可：开放权重/源码可得（source-available, open-weight）；自有增量 PolyForm Noncommercial 1.0.0。
+# 阈值不在本文件定义，见 configs/eval/thresholds.yaml（calibration.status=uncalibrated）。
+
+spec_version: "0.3.0"
+preset: warm_companion
+preset_version: 0.0.0
+text: "今天的日程已经帮你安排好了，记得带伞。"
+identity:
+  speaker_id: agent_main
+  speaker_lock: true
+prosody:
+  rate: 0.92
+  pitch_semitones: -0.5
+  pitch_range: 0.95
+  energy_db: 1.5
+  pause_profile: gentle
+  intonation_strength: 0.6
+style:
+  scenario: 陪伴
+  emotion: tender
+  emotion_strength: 0.6
+  formality: 0.3
+render:
+  sample_rate: 48000
+  format: wav
+  loudness_lufs: -16
+  seed: 20261104
+  watermark: true

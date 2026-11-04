@@ -1,0 +1,46 @@
+# v0.4 模板 / Phase 0 / 非实测 / 状态: template
+# Stage 1 SFT 训练配置模板（监督微调）。
+# Phase 0：无训练产出、无权重、无实测指标。所有 hyperparameters 为占位/目标值，待 Phase 2 校准。
+# 许可：开放权重/源码可得（source-available, open-weight），非 OSI 开源；
+# 自有增量 PolyForm Noncommercial 1.0.0 禁商用 + 双授权；上游 Apache-2.0 原权重第三方仍可按原条款商用。
+# R-18：代码许可 ≠ 权重许可 —— 凡引用第三方须同时登记 code_license 与 weight_license（未知写 null + 待 R-14b 核验）。
+# 控制手段优先级（ADR-0003）：M4 > M2(连续) > M1(离散) > M5 > M3 > M6(DSP 仅降级)。
+# 阈值不在本文件定义，见 thresholds_ref（单一真源，calibration.status=uncalibrated）。
+
+stage: sft
+base_model:
+  selected: unselected        # 未选定 / Phase 2 同台实测定型
+  candidates:                 # 轨道 A：代码与权重均 Apache-2.0，Phase 2 定型
+    - name: CosyVoice 2
+      code_license: apache-2.0
+      weight_license: apache-2.0
+    - name: Qwen3-TTS
+      code_license: apache-2.0
+      weight_license: apache-2.0
+    - name: VoxCPM2
+      code_license: apache-2.0
+      weight_license: apache-2.0
+dataset_manifest: <datasets/manifests/ds-YYYYMMDD-x.yaml>   # Phase 1 数据底座产出
+thresholds_ref: configs/eval/thresholds.yaml
+
+hyperparameters:              # 全部待 Phase 2 校准，以下为占位非实测
+  learning_rate: <float>
+  batch_size: <int>
+  max_steps: <int>
+  warmup_steps: <int>
+  lr_scheduler: <cosine|linear>
+  gradient_accumulation: <int>
+  mixed_precision: <bf16|fp16>
+  lora_rank: <int>            # 轨道 B LoRA 定制，未启用时留 null
+  lora_alpha: <int>
+
+checkpoint:
+  naming: "model-<base>-<stage>-<step>-<score>"   # 见 v0.1 §10 命名规范
+  keep_top_k: <int>           # 按 Q1–Q4 综合分保留 Top-K
+  keep_recent: 3
+
+reproducibility:
+  seed: <int>
+  lock: locks/train.lock       # 依赖锁（推理/训练分离）
+  docker_digest: <sha256:...>
+  model_card: docs/model-cards/<model>.md

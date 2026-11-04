@@ -94,6 +94,9 @@ jobs:
           if printf '%s' "$changed" | grep -qE '^(configs/voicespec/|docs/voicespec/|scripts/validate_voicespec\.py)'; then
             need 'Spec:' 'configs/voicespec/** / docs/voicespec/** / validate_voicespec.py'
           fi
+          if printf '%s' "$changed" | grep -qE '^(docs/implement/|src/|configs/base/|configs/train/|scripts/check_consistency\.py|tests/unit/)'; then
+            need 'Impl:' 'docs/implement/** / src/** / configs/base/** / configs/train/** / check_consistency.py / tests/unit/**'
+          fi
           if printf '%s' "$changed" | grep -q '^datasets/'; then
             need 'Dataset:' 'datasets/**'
           fi

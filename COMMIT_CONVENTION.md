@@ -92,7 +92,7 @@ license: 改许可                        # scope 必填且受保护路径需 Li
 | 服务 | `serve` `api` `stream` |
 | 评估 | `eval` `metrics` `gates` |
 | 合规 | `license` `notice` |
-| 工程 | `deps` `ci` `docs` `refs` |
+| 工程 | `deps` `ci` `docs` `refs` `implement` |
 
 > 新增 scope 需先改本文件 + `.commitlintrc.yml` + `.github/workflows/commitlint.yml`，用 `ci(ci)` 提交，不要临时自造。
 
@@ -111,6 +111,7 @@ license: 改许可                        # scope 必填且受保护路径需 Li
 | `Refs:` | 关联 issue / PR / 文档 | `Refs: #42` 或 `Refs: VM-TECH-001 v0.2 §3` |
 | `Gate-Report:` | 改 `configs/eval/thresholds.yaml`、`configs/presets/**`、`dicts/**`、`docs/model-cards/**` | `Gate-Report: gs-2026-11-a` |
 | `Spec:` | 改 `configs/voicespec/**`、`docs/voicespec/**`、`scripts/validate_voicespec.py` | `Spec: voicespec@0.3.0` |
+| `Impl:` | 改 `docs/implement/**`、`src/**`、`configs/base/**`、`configs/train/**`、`scripts/check_consistency.py`、`tests/unit/**` | `Impl: implement-spec@0.4` |
 | `Preset:` | 改 preset | `Preset: warm_companion@1.3.0` |
 | `Dataset:` | 新增/更新数据集或 manifest | `Dataset: ds-20261104-a` |
 | `Model:` | 新增/更新权重或 adapter | `Model: cv2-lora-20261104-s1200` |
@@ -119,7 +120,7 @@ license: 改许可                        # scope 必填且受保护路径需 Li
 | `BREAKING CHANGE:` | 不兼容变更 | `BREAKING CHANGE: VoiceSpec 移除 rate 字段` |
 | `Reverts:` | `revert` 类型 | `Reverts: <sha>` |
 
-> **CI 规则**：`license-check` 工作流会扫描 PR 改动路径与 commit footer；缺 `License:` / `License-Review:` / `Gate-Report:` 直接失败。
+> **CI 规则**：`license-check` 工作流会扫描 PR 改动路径与 commit footer；缺 `License:` / `License-Review:` / `Gate-Report:` 直接失败；`commitlint` 工作流会校验 `Spec:`（v0.3 起）与 `Impl:`（v0.4 起）触发条件。
 
 ## 6. 受保护路径（CODEOWNERS）
 
@@ -132,6 +133,8 @@ license: 改许可                        # scope 必填且受保护路径需 Li
 | `configs/presets/**` | maintainer 批准 + `Gate-Report:` + `Preset:` |
 | `configs/eval/thresholds.yaml` | maintainer 批准 + `Gate-Report:`；校准只能收紧 |
 | `configs/voicespec/**` · `docs/voicespec/**` | maintainer 批准 + `Spec:` footer；契约变更须同步错误码表与 ADR-0003 |
+| `docs/implement/**` · `src/**` | maintainer 批准 + `Impl:` footer；**Phase 0 期间 `src/**` 只允许签名占位**，出现实现代码须先改 ADR-0004 / D16 |
+| `scripts/check_consistency.py` · `tests/unit/**` | maintainer 批准；单测须保持 `python -m unittest discover -s tests/unit` 全绿 |
 
 ## 7. 分支与 PR
 

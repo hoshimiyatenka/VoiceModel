@@ -6,8 +6,8 @@
 | 项 | 内容 |
 | --- | --- |
 | 仓库 | `https://github.com/hoshimiyatenka/VoiceModel` |
-| 当前阶段 | **Phase 0 — 立项 / 选型核验期**（尚未开始数据与训练，无实测指标） |
-| 当前方案 | [`docs/AI智能体声音训练项目_技术栈方案_v0.3.md`](docs/AI智能体声音训练项目_技术栈方案_v0.3.md) |
+| 当前阶段 | **Phase 0 — 立项 / 选型核验期**（尚未开始数据与训练，无实测指标；v0.4 落的是规格/模板/骨架，不是实现） |
+| 当前方案 | [`docs/AI智能体声音训练项目_技术栈方案_v0.4.md`](docs/AI智能体声音训练项目_技术栈方案_v0.4.md)（实施就绪版） |
 | 许可 | **PolyForm Noncommercial License 1.0.0**（开放权重 / 源码可得，**禁止商业化**） |
 
 ---
@@ -42,11 +42,13 @@
 
 每个连续参数须过 5 点扫描门禁（单调 ρ ≥ 0.90、UTMOS 下降 ≤ 0.30、说话人 cosine 漂移 ≤ 0.03）。完整定义见方案 v0.1 §5 / v0.2 §5。
 
-**v0.3 起契约已机器可读**：[`configs/voicespec/voicespec.schema.json`](configs/voicespec/voicespec.schema.json)（JSON Schema 2020-12）、[`docs/voicespec/README.md`](docs/voicespec/README.md)、[`docs/voicespec/ERROR-CODES.md`](docs/voicespec/ERROR-CODES.md)、[`docs/decisions/ADR-0003.md`](docs/decisions/ADR-0003.md)。本地校验：
+**v0.3 起契约已机器可读，v0.4 冻结不改**：[`configs/voicespec/voicespec.schema.json`](configs/voicespec/voicespec.schema.json)（JSON Schema 2020-12，`spec_version="0.3.0"`）、[`docs/voicespec/README.md`](docs/voicespec/README.md)、[`docs/voicespec/ERROR-CODES.md`](docs/voicespec/ERROR-CODES.md)、[`docs/decisions/ADR-0003.md`](docs/decisions/ADR-0003.md)。**v0.4 落实施规格、配置模板、代码骨架与一致性校验器，实现留 Phase 2/3**（[`docs/implement/README.md`](docs/implement/README.md) · [`ADR-0004`](docs/decisions/ADR-0004.md)）。本地校验：
 
 ```bash
 python -m pip install -r scripts/requirements.txt
 python scripts/validate_voicespec.py configs/voicespec/examples/*.json
+python scripts/check_consistency.py --repo-root .
+python -m unittest discover -s tests/unit -v
 ```
 
 最小请求（[`minimal.json`](configs/voicespec/examples/minimal.json)）：
@@ -82,8 +84,10 @@ P1 数据底座 → P2 基线复现与定型 → P3 参数化控制层 → P4 �
 
 | 文档 | 内容 |
 | --- | --- |
-| [`docs/AI智能体声音训练项目_技术栈方案_v0.3.md`](docs/AI智能体声音训练项目_技术栈方案_v0.3.md) | **当前方案**：契约落地、R-14 核验回填、v0.3 迭代 |
-| [`docs/AI智能体声音训练项目_技术栈方案_v0.2.md`](docs/AI智能体声音训练项目_技术栈方案_v0.2.md) | 上一版（归档）：许可策略、论文体系、核验回填、提交规范 |
+| [`docs/AI智能体声音训练项目_技术栈方案_v0.4.md`](docs/AI智能体声音训练项目_技术栈方案_v0.4.md) | **当前方案（实施就绪版）**：规格全量、编号闭合、配置模板、代码骨架、一致性校验、收敛路线 |
+| [`docs/implement/README.md`](docs/implement/README.md) | **★ 九份实施规格总索引**（控制/API/preset/数据/manifest/训练/评估/部署/法务） |
+| [`docs/AI智能体声音训练项目_技术栈方案_v0.3.md`](docs/AI智能体声音训练项目_技术栈方案_v0.3.md) | 归档：契约落地、R-14 核验回填 |
+| [`docs/AI智能体声音训练项目_技术栈方案_v0.2.md`](docs/AI智能体声音训练项目_技术栈方案_v0.2.md) | 归档：许可策略、论文体系、核验回填、提交规范 |
 | [`docs/AI智能体声音训练项目_技术栈方案_v0.1.md`](docs/AI智能体声音训练项目_技术栈方案_v0.1.md) | 初版（归档）：五层参数体系、数据/训练/评估/排期全文（根目录亦保留一份 `AI智能体声音训练项目_技术栈方案_v0.1.md`） |
 | [`docs/references/PAPERS.md`](docs/references/PAPERS.md) | **权威论文清单**（58 篇，国内外，逐篇 arXiv ID + 发表信息 + 方案关联；v0.3 补录 6 篇并降级发表状态表述） |
 | [`docs/licensing/UPSTREAM-LICENSE-MATRIX.md`](docs/licensing/UPSTREAM-LICENSE-MATRIX.md) | 上游许可证核验矩阵与传导分析（核验 2026-11-04） |

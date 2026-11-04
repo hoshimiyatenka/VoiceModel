@@ -1,0 +1,50 @@
+# v0.4 模板 / Phase 0 / 非实测 / 状态: template
+# 基座 / 推理配置模板。
+# Phase 0：无训练产出、无权重、无实测指标。candidates 三家均未选定，Phase 2 同台实测定型。
+# 许可：开放权重/源码可得（source-available, open-weight），非 OSI 开源；
+# 自有增量 PolyForm Noncommercial 1.0.0 禁商用 + 双授权；上游 Apache-2.0 原权重第三方仍可按原条款商用。
+# R-18：代码许可 ≠ 权重许可 —— 凡引用第三方须同时登记 code_license 与 weight_license（未知写 null + 待 R-14b 核验）。
+# 控制手段优先级（ADR-0003）：M4 > M2(连续) > M1(离散) > M5 > M3 > M6(DSP 仅降级)。
+# VoiceSpec 契约 configs/voicespec/voicespec.schema.json（spec_version=0.3.0，v0.4 不升版本）。
+# 阈值不在本文件定义，见 thresholds_ref（单一真源，calibration.status=uncalibrated）。
+
+selected: unselected          # 未选定 / Phase 2 同台实测定型
+voice_spec_ref: configs/voicespec/voicespec.schema.json
+thresholds_ref: configs/eval/thresholds.yaml
+
+candidates:                   # 轨道 A：代码与权重均 Apache-2.0，Phase 2 定型，不写死某一家为已选
+  - name: CosyVoice 2
+    code_license: apache-2.0
+    weight_license: apache-2.0
+    selected: false
+    phase2_note: "Phase 2 同台实测：中文自然度/零样本相似度/可控性/延迟"
+  - name: Qwen3-TTS
+    code_license: apache-2.0
+    weight_license: apache-2.0
+    selected: false
+    phase2_note: "Phase 2 同台实测：中文自然度/零样本相似度/可控性/延迟"
+  - name: VoxCPM2
+    code_license: apache-2.0
+    weight_license: apache-2.0
+    selected: false
+    phase2_note: "Phase 2 同台实测：中文自然度/零样本相似度/可控性/延迟"
+
+capability_flags:             # 全部 null，Phase 2 实测能力探测后回填（决定 E-CAPABILITY-* 行为）
+  exact_duration: null        # 对应 F4 / Q6 / duration_mode=exact；不支持则 E-CAPABILITY-001
+  f0_contour: null            # 对应 M2 声学特征编辑（pitch_contour 曲线）
+  attribute_control: null     # 对应 AttributeSpec 候选，逐属性过 §5.6 扫描才开放
+  style_prompt: null          # 对应 E-CAPABILITY-004，不得单独作 preset 唯一控制手段
+  voice_blend: null           # 对应 E-CONFLICT-004（speaker_lock=true 时禁用）
+
+vocoder:                      # 波形重建；权重许可需 R-14b 核验（见下注）
+  candidates:
+    - name: HiFi-GAN
+      code_license: mit
+      weight_license: null    # 待 R-14b 核验：HF 权重卡许可不统一（cc-by-nc / cc-by / 无 tag）
+    - name: BigVGAN
+      code_license: mit
+      weight_license: null    # 待 R-14b 核验
+    - name: Vocos
+      code_license: mit
+      weight_license: mit     # gemelo-ai/vocos 与 charactr 权重均 MIT（arXiv:2306.00814）
+  selected: unselected        # 未选定 / Phase 2 定型

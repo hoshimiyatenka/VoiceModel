@@ -46,3 +46,26 @@
 - 仍为 Phase 0：无任何训练产出与实测指标；`eval-gate` 的 VoiceSpec 契约校验真实生效，golden_set / Q1–Q10 门禁仍为骨架。
 - D11 法务定稿仍是发布权重前阻塞项；本批次仅文档/代码层，不触碰权重发布。
 - 新增 R-17（契约与实现漂移风险），Phase 3 靠错误码稳定 + 单测缓解。
+
+## v0.4.0 (2026-11-04)
+
+> 实施就绪批次（D16 / ADR-0004：**先规格、后实现**）。只落规格、模板、骨架与守卫，不写实现。
+
+### Features
+
+- **docs**: 建立技术栈方案 v0.4（实施就绪版，VM-TECH-001）——阶段门与 G0 硬前置、F1–F8/Q1–Q10 追溯矩阵、决策注册表 D1–D22、风险 R-01–R-24、版本收敛路线
+- **docs**: 建立 ADR-0004（实施就绪路线），确立 Phase 0 不变量：`spec_version=="0.3.0"`、顶层 `additionalProperties===false`、错误码只追加、`calibration.status=="uncalibrated"`、`registry.production==null`、不称 OSI 开源
+- **docs**: 建立九份实施规格（`docs/implement/`）：控制层 / API / preset 注册中心 / 数据流水线 / 数据集 manifest / 训练 / 评估门禁 / 部署 / 许可实施
+- **configs**: 落地配置模板——`configs/base/base.template.yaml`（capability flags 全 `null` 待实测）、`configs/train/{sft,dpo,quantize}.template.yaml`、`configs/presets/registry.yaml`（`production: null`）、`configs/presets/examples/warm_companion.template.yaml`
+- **control**: 落地代码骨架 `src/control/validator.py`（`CapabilityFlags` / `ControlContext` / `ValidationIssue` / `AuditPatch` / `ValidationResult` / `validate_control`）与 `src/serve/api.py`（5 端点），全部 `NotImplementedError`
+- **ci**: 新增 `scripts/check_consistency.py` 五项检查（错误码分层比对 / 契约常量硬 FAIL / Markdown 断链 / v0.4 状态标记 / 阈值校准状态）并接入 `eval-gate`
+- **test**: 新增 `tests/unit/test_spec_consistency.py` 与 `tests/unit/test_skeleton_contract.py`（13 个测试），把「只落占位」「字段名不可改」变成可执行断言
+- **ci**: 新增 `Impl:` footer 校验与 `docs/implement/**` · `src/**` 受保护路径
+
+### Notes
+
+- 仍为 Phase 0：**无训练产出、无模型权重、无实测指标、无运行中的服务**；`eval-gate` 真实生效的仅契约校验、一致性检查与单测。
+- 阈值仍为 `uncalibrated`，任何数值均为目标值，**不得当作实测结论**（R-22）。
+- `registry.production` 为 `null`（D18），preset 尚未过生产准入（R-21）。
+- 已知缺口（v0.5 回填）：`voice_blend`+`speaker_lock=false` 缺专用错误码、`W-PRESET-001` 未在错误码表登记；本版**不新增错误码**。
+- D11 法务定稿、R-14b 九项、D1–D10 拍板仍为 G0 硬前置，阻塞权重发布与数据采集。

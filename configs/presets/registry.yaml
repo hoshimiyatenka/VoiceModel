@@ -1,0 +1,24 @@
+# v0.4 模板 / Phase 0 / 非实测 / 状态: template
+# preset 注册中心骨架。字段与 docs/implement/control/PRESET-REGISTRY-SPEC.md 对齐。
+# 硬规则：production 指针必须指向 status=production 且带非空 gate_report 的版本
+# （缓解 R-21 空 gate_report 上线 / D18，见主方案 v0.4）。
+# versions[].path 为仓库根相对路径；C 层按 PRESET-REGISTRY-SPEC.md §2 以 configs/presets/ 为基准解析。
+# Phase 0 无 production preset；preset 是默认值集合，spec 中显式字段覆盖之。
+# 许可：开放权重/源码可得（source-available, open-weight），非 OSI 开源；
+# 自有增量 PolyForm Noncommercial 1.0.0 禁商用 + 双授权；
+# 上游 Apache-2.0 原权重第三方仍可按原条款商用。
+# 阈值不在本文件定义，见 thresholds_ref（单一真源）。
+
+schema_ref: configs/voicespec/voicespec.schema.json
+thresholds_ref: configs/eval/thresholds.yaml
+production: null   # Phase 0 无 production preset；转 production 须带非空 gate_report
+
+presets:
+  - preset_id: warm_companion
+    versions:
+      - version: 0.0.0            # 占位版本；Phase 3 注册真实版本从 1.0.0 起
+        path: configs/presets/examples/warm_companion.template.yaml
+        status: template          # template | staging | production
+        gate_report: null         # 转 production 前必须非空（gs-YYYY-MM-x）
+        created_by: lead          # PRESET-REGISTRY-SPEC.md §2 要求必填（非凭据，模板示例）
+        approved_by: null         # Phase 3 审批时填充

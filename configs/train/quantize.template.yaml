@@ -1,0 +1,45 @@
+# v0.4 模板 / Phase 0 / 非实测 / 状态: template
+# Stage 3 量化 / 蒸馏配置模板（延迟与成本优化）。
+# Phase 0：无训练产出、无权重、无实测指标。所有 hyperparameters 为占位/目标值，待 Phase 2 校准。
+# 许可：开放权重/源码可得（source-available, open-weight），非 OSI 开源；
+# 自有增量 PolyForm Noncommercial 1.0.0 禁商用 + 双授权；上游 Apache-2.0 原权重第三方仍可按原条款商用。
+# R-18：代码许可 ≠ 权重许可 —— 凡引用第三方须同时登记 code_license 与 weight_license（未知写 null + 待 R-14b 核验）。
+# R-10 量化后质量越界（v0.1 §13）：量化/蒸馏后强制重跑全量门禁（Q1–Q10），任一硬指标不通过即回滚到量化前 checkpoint。
+# 目标：满足 Q7 延迟与成本，且不越过 Q1–Q4 门禁。
+# 控制手段优先级（ADR-0003）：M4 > M2(连续) > M1(离散) > M5 > M3 > M6(DSP 仅降级)。
+# 阈值不在本文件定义，见 thresholds_ref（单一真源，calibration.status=uncalibrated）。
+
+stage: quantize
+base_model:
+  selected: unselected        # 未选定 / Phase 2 同台实测定型
+  source_checkpoint: <model-<base>-dpo-<step>-<score>>
+  candidates:                 # 轨道 A：代码与权重均 Apache-2.0，Phase 2 定型
+    - name: CosyVoice 2
+      code_license: apache-2.0
+      weight_license: apache-2.0
+    - name: Qwen3-TTS
+      code_license: apache-2.0
+      weight_license: apache-2.0
+    - name: VoxCPM2
+      code_license: apache-2.0
+      weight_license: apache-2.0
+dataset_manifest: <datasets/manifests/ds-YYYYMMDD-x-calib.yaml>  # 量化校准集
+thresholds_ref: configs/eval/thresholds.yaml
+
+hyperparameters:              # 全部待 Phase 2 校准，以下为占位非实测
+  quantization: <int8|int4|fp8|fp16>
+  calibration_samples: <int>
+  distillation: <bool>        # 是否启用蒸馏
+  teacher_checkpoint: <path|null>
+
+checkpoint:
+  naming: "model-<base>-<stage>-<step>-<score>"
+  keep_top_k: <int>
+  keep_recent: 3
+  rollback_to: <model-<base>-dpo-<step>-<score>>   # R-10 越界回滚目标
+
+reproducibility:
+  seed: <int>
+  lock: locks/train.lock
+  docker_digest: <sha256:...>
+  model_card: docs/model-cards/<model>.md

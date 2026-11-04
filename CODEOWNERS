@@ -25,3 +25,13 @@
 /.commitlintrc.yml                @hoshimiyatenka
 /CONTRIBUTING.md                  @hoshimiyatenka
 /.github/workflows/               @hoshimiyatenka
+
+# v0.4 实施规格与代码骨架（D16 / ADR-0004：Phase 0 只允许签名占位）
+/docs/implement/                  @hoshimiyatenka
+/src/                             @hoshimiyatenka
+/configs/base/                    @hoshimiyatenka
+/configs/train/                   @hoshimiyatenka
+/scripts/check_consistency.py     @hoshimiyatenka
+/scripts/validate_voicespec.py    @hoshimiyatenka
+/tests/unit/                      @hoshimiyatenka
+/docs/decisions/ADR-0004.md       @hoshimiyatenka

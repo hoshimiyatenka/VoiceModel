@@ -1,7 +1,7 @@
 name: eval-gate
 
 # 评估门禁骨架（Phase 0）。当前仅做结构与配置校验 +
-# VoiceSpec 契约/示例校验（机器可执行，v0.3 起真实生效）。
+# VoiceSpec 契约/示例校验（v0.3 起真实生效）+ 一致性检查与单测（v0.4 起真实生效）。
 # Phase 2 起接入 src/eval/ 的 golden_set 全量合成与 Q1–Q10 门禁。
 # 阈值单一真源：configs/eval/thresholds.yaml
 
@@ -11,8 +11,13 @@ on:
       - "configs/eval/**"
       - "configs/presets/**"
       - "configs/voicespec/**"
+      - "configs/base/**"
+      - "configs/train/**"
       - "scripts/validate_voicespec.py"
+      - "scripts/check_consistency.py"
+      - "tests/unit/**"
       - "docs/voicespec/**"
+      - "docs/implement/**"
       - "src/**"
       - "tests/regression/**"
       - "docs/model-cards/**"
@@ -22,6 +27,8 @@ on:
       - "configs/eval/**"
       - "configs/voicespec/**"
       - "scripts/validate_voicespec.py"
+      - "scripts/check_consistency.py"
+      - "tests/unit/**"
       - "src/**"
 
 permissions:
@@ -63,5 +70,11 @@ jobs:
       - name: 校验 VoiceSpec 契约与示例（v0.3 起真实生效）
         run: python scripts/validate_voicespec.py configs/voicespec/examples/*.json
 
+      - name: 契约/架构一致性检查（v0.4 起真实生效）
+        run: python scripts/check_consistency.py --repo-root .
+
+      - name: 单元测试（契约一致性 + 代码骨架占位约束）
+        run: python -m unittest discover -s tests/unit -v
+
       - name: 提示（未接入真实门禁）
-        run: echo "::notice::eval-gate 当前为 Phase 0 骨架，尚未运行真实合成门禁；VoiceSpec 契约校验已生效。"
+        run: echo "::notice::eval-gate 当前为 Phase 0 骨架，尚未运行真实合成门禁；契约校验、一致性检查与单测已生效。"

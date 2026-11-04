@@ -17,7 +17,9 @@
 | 文档 | 内容 |
 | --- | --- |
 | [`README.md`](README.md) | 项目入口、快速开始 |
-| [`docs/AI智能体声音训练项目_技术栈方案_v0.3.md`](docs/AI智能体声音训练项目_技术栈方案_v0.3.md) | **当前技术方案** |
+| [`docs/AI智能体声音训练项目_技术栈方案_v0.4.md`](docs/AI智能体声音训练项目_技术栈方案_v0.4.md) | **当前技术方案（实施就绪版）** |
+| [`docs/implement/README.md`](docs/implement/README.md) | 九份实施规格总索引 |
+| [`docs/AI智能体声音训练项目_技术栈方案_v0.3.md`](docs/AI智能体声音训练项目_技术栈方案_v0.3.md) | 归档：契约落地 |
 | [`docs/AI智能体声音训练项目_技术栈方案_v0.2.md`](docs/AI智能体声音训练项目_技术栈方案_v0.2.md) | v0.2（归档） |
 | [`docs/AI智能体声音训练项目_技术栈方案_v0.1.md`](docs/AI智能体声音训练项目_技术栈方案_v0.1.md) | 初版（归档；根目录亦保留一份） |
 | [`COMMIT_CONVENTION.md`](COMMIT_CONVENTION.md) | **★ 提交规范（必读）** |
@@ -69,6 +71,9 @@ cd VoiceModel
 [ ] 未提交音频实体 / checkpoint / 授权书扫描件 / .env / 密钥 / 个人信息
 [ ] 涉及 preset / 阈值 / 权重 / 数据集 / VoiceSpec 契约时填了对应 footer
 [ ] 改 VoiceSpec 契约后跑过 `python scripts/validate_voicespec.py configs/voicespec/examples/*.json`
+[ ] 改 docs/implement/** · src/** · configs/{base,train}/** 后跑过 `python scripts/check_consistency.py --repo-root .`（须 5 项全 OK）
+[ ] 单测全绿：`python -m unittest discover -s tests/unit -v`
+[ ] Phase 0 期间未在 `src/**` 写入实现代码（只允许签名占位 + NotImplementedError，见 ADR-0004 / D16）
 [ ] 新增第三方依赖或基座已更新 UPSTREAM-LICENSE-MATRIX.md 与 NOTICE
 [ ] 方案变更已同步 docs/ 对应文档与修订记录
 [ ] 引用论文带 arXiv ID 且已加入 docs/references/PAPERS.md
@@ -86,6 +91,8 @@ cd VoiceModel
 | `configs/presets/**` | maintainer 批准 + Gate-Report |
 | `configs/eval/thresholds.yaml` | maintainer 批准 + Gate-Report，校准只能收紧 |
 | `configs/voicespec/**` · `docs/voicespec/**` | maintainer 批准 + `Spec:` footer |
+| `docs/implement/**` · `src/**` | maintainer 批准 + `Impl:` footer；Phase 0 只允许签名占位 |
+| `scripts/{check_consistency,validate_voicespec}.py` · `tests/unit/**` | maintainer 批准；须保持单测全绿 |
 
 ## 7. 行为准则
 
