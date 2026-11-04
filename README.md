@@ -97,6 +97,8 @@ P1 数据底座 → P2 基线复现与定型 → P3 参数化控制层 → P4 �
 | [`docs/decisions/ADR-0001.md`](docs/decisions/ADR-0001.md) | 许可策略决策 |
 | [`docs/decisions/ADR-0002.md`](docs/decisions/ADR-0002.md) | 基座选型方法与评分卡 |
 | [`docs/decisions/ADR-0003.md`](docs/decisions/ADR-0003.md) | 参数化控制层实现路径 |
+| [`docs/decisions/ADR-0004.md`](docs/decisions/ADR-0004.md) | 实施就绪路线（先规格、后实现；Phase 0 不变量） |
+| [`docs/decisions/DECISION-SHEET.md`](docs/decisions/DECISION-SHEET.md) | **★ 决策表 D1–D11**（可勾选拍板：选项 / 代价 / 建议 / 不拍板的后果） |
 | [`COMMIT_CONVENTION.md`](COMMIT_CONVENTION.md) | **★ 提交规范**（Conventional Commits 定制 + CI 强制） |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | 贡献流程与检查清单 |
 | [`LICENSE-COMMERCIAL.md`](LICENSE-COMMERCIAL.md) | 商业授权入口 |

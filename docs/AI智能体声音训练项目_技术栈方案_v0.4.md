@@ -184,6 +184,8 @@
 
 ## 5. 决策注册表（D1–D22）
 
+> **D1–D10 与 D11 的可勾选拍板表**见 [`docs/decisions/DECISION-SHEET.md`](decisions/DECISION-SHEET.md)（逐项列选项、代价、建议与「不拍板的后果」）。
+
 ### 5.1 既有决策状态（D1–D15）
 
 | ID | 决策点 | 状态 |
@@ -568,7 +570,7 @@ M4 > M2(连续声学特征编辑) > M1(离散标签) > M5 > M3 > M6(DSP，仅降
 ### 19.1 文件索引（本版新增）
 
 - 主方案：[v0.4（本文件）](AI智能体声音训练项目_技术栈方案_v0.4.md) · [v0.3](AI智能体声音训练项目_技术栈方案_v0.3.md) · [v0.2](AI智能体声音训练项目_技术栈方案_v0.2.md) · [v0.1](AI智能体声音训练项目_技术栈方案_v0.1.md)
-- 决策：[ADR-0001](decisions/ADR-0001.md) · [ADR-0002](decisions/ADR-0002.md) · [ADR-0003](decisions/ADR-0003.md) · [ADR-0004](decisions/ADR-0004.md)
+- 决策：[ADR-0001](decisions/ADR-0001.md) · [ADR-0002](decisions/ADR-0002.md) · [ADR-0003](decisions/ADR-0003.md) · [ADR-0004](decisions/ADR-0004.md) · [决策表 D1–D11](decisions/DECISION-SHEET.md)
 - 契约：[schema](../configs/voicespec/voicespec.schema.json) · [ERROR-CODES](voicespec/ERROR-CODES.md) · [README](voicespec/README.md)
 - 许可：[LICENSE](../LICENSE) · [NOTICE](../NOTICE) · [LICENSE-COMMERCIAL](../LICENSE-COMMERCIAL.md) · [许可证矩阵](licensing/UPSTREAM-LICENSE-MATRIX.md)
 - 论文：[PAPERS.md](references/PAPERS.md)
