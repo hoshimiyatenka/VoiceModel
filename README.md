@@ -7,7 +7,7 @@
 | --- | --- |
 | 仓库 | `https://github.com/hoshimiyatenka/VoiceModel` |
 | 当前阶段 | **Phase 0 — 立项 / 选型核验期**（尚未开始数据与训练，无实测指标） |
-| 当前方案 | [`docs/AI智能体声音训练项目_技术栈方案_v0.2.md`](docs/AI智能体声音训练项目_技术栈方案_v0.2.md) |
+| 当前方案 | [`docs/AI智能体声音训练项目_技术栈方案_v0.3.md`](docs/AI智能体声音训练项目_技术栈方案_v0.3.md) |
 | 许可 | **PolyForm Noncommercial License 1.0.0**（开放权重 / 源码可得，**禁止商业化**） |
 
 ---
@@ -42,15 +42,23 @@
 
 每个连续参数须过 5 点扫描门禁（单调 ρ ≥ 0.90、UTMOS 下降 ≤ 0.30、说话人 cosine 漂移 ≤ 0.03）。完整定义见方案 v0.1 §5 / v0.2 §5。
 
+**v0.3 起契约已机器可读**：[`configs/voicespec/voicespec.schema.json`](configs/voicespec/voicespec.schema.json)（JSON Schema 2020-12）、[`docs/voicespec/README.md`](docs/voicespec/README.md)、[`docs/voicespec/ERROR-CODES.md`](docs/voicespec/ERROR-CODES.md)、[`docs/decisions/ADR-0003.md`](docs/decisions/ADR-0003.md)。本地校验：
+
+```bash
+python -m pip install -r scripts/requirements.txt
+python scripts/validate_voicespec.py configs/voicespec/examples/*.json
+```
+
+最小请求（[`minimal.json`](configs/voicespec/examples/minimal.json)）：
+
 ```json
 {
-  "preset": "warm_companion@1.3.0",
-  "spec": {
-    "identity": {"speaker_id": "agent_main", "speaker_lock": true},
-    "prosody": {"rate": 0.92, "pitch_semitones": -0.5, "pause_profile": "gentle"},
-    "style": {"emotion": "tender", "emotion_strength": 0.6, "scenario": "陪伴"},
-    "render": {"streaming": true, "loudness_lufs": -16, "watermark": true}
-  }
+  "spec_version": "0.3.0",
+  "text": "你好，我是你的智能助手。",
+  "identity": { "speaker_id": "agent_main" },
+  "prosody": { "rate": 0.92, "pitch_semitones": -0.5, "pause_profile": "gentle" },
+  "style": { "emotion": "tender", "emotion_strength": 0.6, "scenario": "陪伴" },
+  "render": { "streaming": true, "loudness_lufs": -16, "watermark": true }
 }
 ```
 
@@ -74,12 +82,17 @@ P1 数据底座 → P2 基线复现与定型 → P3 参数化控制层 → P4 �
 
 | 文档 | 内容 |
 | --- | --- |
-| [`docs/AI智能体声音训练项目_技术栈方案_v0.2.md`](docs/AI智能体声音训练项目_技术栈方案_v0.2.md) | **当前方案**：许可策略、论文体系、核验回填、提交规范 |
+| [`docs/AI智能体声音训练项目_技术栈方案_v0.3.md`](docs/AI智能体声音训练项目_技术栈方案_v0.3.md) | **当前方案**：契约落地、R-14 核验回填、v0.3 迭代 |
+| [`docs/AI智能体声音训练项目_技术栈方案_v0.2.md`](docs/AI智能体声音训练项目_技术栈方案_v0.2.md) | 上一版（归档）：许可策略、论文体系、核验回填、提交规范 |
 | [`docs/AI智能体声音训练项目_技术栈方案_v0.1.md`](docs/AI智能体声音训练项目_技术栈方案_v0.1.md) | 初版（归档）：五层参数体系、数据/训练/评估/排期全文（根目录亦保留一份 `AI智能体声音训练项目_技术栈方案_v0.1.md`） |
-| [`docs/references/PAPERS.md`](docs/references/PAPERS.md) | **权威论文清单**（52 篇，国内外，逐篇 arXiv ID + 发表信息 + 方案关联） |
+| [`docs/references/PAPERS.md`](docs/references/PAPERS.md) | **权威论文清单**（58 篇，国内外，逐篇 arXiv ID + 发表信息 + 方案关联；v0.3 补录 6 篇并降级发表状态表述） |
 | [`docs/licensing/UPSTREAM-LICENSE-MATRIX.md`](docs/licensing/UPSTREAM-LICENSE-MATRIX.md) | 上游许可证核验矩阵与传导分析（核验 2026-11-04） |
+| [`configs/voicespec/voicespec.schema.json`](configs/voicespec/voicespec.schema.json) | **★ VoiceSpec 机器可读契约**（JSON Schema 2020-12） |
+| [`docs/voicespec/README.md`](docs/voicespec/README.md) | VoiceSpec 使用说明 |
+| [`docs/voicespec/ERROR-CODES.md`](docs/voicespec/ERROR-CODES.md) | 校验错误码表 |
 | [`docs/decisions/ADR-0001.md`](docs/decisions/ADR-0001.md) | 许可策略决策 |
 | [`docs/decisions/ADR-0002.md`](docs/decisions/ADR-0002.md) | 基座选型方法与评分卡 |
+| [`docs/decisions/ADR-0003.md`](docs/decisions/ADR-0003.md) | 参数化控制层实现路径 |
 | [`COMMIT_CONVENTION.md`](COMMIT_CONVENTION.md) | **★ 提交规范**（Conventional Commits 定制 + CI 强制） |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | 贡献流程与检查清单 |
 | [`LICENSE-COMMERCIAL.md`](LICENSE-COMMERCIAL.md) | 商业授权入口 |

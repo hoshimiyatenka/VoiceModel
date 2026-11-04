@@ -3,16 +3,17 @@
 | 项 | 内容 |
 | --- | --- |
 | 文档编号 | VM-REF-001 |
-| 版本 | v0.2（对应技术栈方案 v0.2 §3） |
-| 核验日期 | **2026-11-04** |
+| 版本 | **v0.3**（对应技术栈方案 v0.3 §4；v0.2 为 52 篇，本版补录 6 篇并降级发表状态表述） |
+| 核验日期 | **2026-11-04**（v0.3 补录与复核同日，Lead 本地 + subagent 双路交叉印证） |
 | 核验方法 | arXiv Atom API `https://export.arxiv.org/api/query?id_list=...`，逐篇取回 `id` / `title` / `published` / `author` / `journal_ref` / `comment` 字段 |
-| 收录篇数 | **52 篇**（去重独立论文；另含 2 处跨层引用占位） |
+| 收录篇数 | **58 篇**（去重独立论文；另含 2 处跨层引用占位） |
 | 用途 | 技术选型、参数化控制体系、评估门禁、合规水印的权威依据 |
 
 ## 核验声明
 
 - 下表所有 **arXiv ID、标题、首发日期、作者、发表信息**均来自 arXiv API 实际返回值，未凭记忆填写。
 - `发表/状态` 列取自 arXiv 的 `comment` / `journal_ref` 字段；标 `—` 表示 API 未提供（技术报告或预印本），引用时请以论文首页为准。
+- **v0.3 重要降级**：本轮对 13 个 ID 复核，**`arxiv:journal_ref` 全部为空**；ICLR / ICML / NeurIPS / INTERSPEECH 等会议归属仅来自 `comment` 自述，**未经 `journal_ref` 确认**。清单中此类一律理解为「arXiv comment 自述」，须从会议官网或 DBLP 二手核验后才可升级。详见 §分组统计后的「发表状态降级」与方案 v0.3 §4.3.3。
 - `机构倾向` 按作者署名与公开信息整理，用于说明「国内外覆盖」，**不作为精确机构归属证明**。
 - 论文链接统一格式：`https://arxiv.org/abs/<ID>`（去掉版本后缀亦可）。
 - 本清单是**技术参考**，不是法律文件；上游代码/权重许可证见 [`../licensing/UPSTREAM-LICENSE-MATRIX.md`](../licensing/UPSTREAM-LICENSE-MATRIX.md)。
@@ -127,11 +128,55 @@
 | L-3 可控 / 指令 / 国产基座 | 10 | 29–38 |
 | L-4 中文数据 / 工具链 | 8 | 40–47 |
 | L-5 评估 / 水印 / 说话人 | 6 | 48–53 |
-| **合计（去重）** | **52 篇** | — |
+| **v0.3 补录** | **6** | **55–60**（见下） |
+| **合计（去重）** | **58 篇** | — |
 
-> 说明：本清单经逐条去重后实际收录 **52 篇**独立论文（另含 2 处跨层引用占位 #39 / #54）。方案 v0.2 正文与清单已统一为 **52 篇**。
+> 说明：v0.2 收录 52 篇；**v0.3 补录 6 篇 → 58 篇**（另含 2 处跨层引用占位 #39 / #54，不计入）。方案 v0.3 §4.3.4 与本文统一为 58 篇；归档版 v0.2 正文仍记 52 篇，以本版为准。
 >
-> 国内外覆盖：国内团队主导约 30 篇（MSRA/微软、阿里通义、字节 Seed、bilibili、OpenBMB/面壁、WeNet 社区、希尔贝壳、港中文等），国外团队主导约 22 篇（Google、Meta、OpenAI、NVIDIA、Microsoft、CMU、Oxford、东大 SaruLab、Ghent、Kakao 等）。机构倾向仅用于说明覆盖面，不作精确归属。
+> 国内外覆盖：国内团队主导约 32 篇（MSRA/微软、阿里通义、字节 Seed、bilibili、OpenBMB/面壁、WeNet 社区、希尔贝壳、港中文等），国外团队主导约 26 篇（Google、Meta、OpenAI、NVIDIA、Microsoft、CMU、Oxford、东大 SaruLab、Ghent、Kakao、Numediart 等）。机构倾向仅用于说明覆盖面，不作精确归属。
+
+---
+
+## v0.3 补录（6 篇，2026-11-04 核验）
+
+| # | arXiv ID | 标题 | 首发 | 第一作者 | 发表/状态（arXiv 实际值） | 机构倾向 | 与本方案 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 55 | `2601.15621` | Qwen3-TTS Technical Report | 2026-01-22 | Hangrui Hu | `journal_ref` 空；`comment` = `https://github.com/QwenLM/Qwen3-TTS` | 国内 (阿里 / 通义) | **补齐 v0.2 缺口**：轨道 A 首选候选 Qwen3-TTS 的官方技术报告；摘要称 multilingual / controllable / robust / streaming |
+| 56 | `2610.23678` | Beyond the Benchmark: Conditioning, Domains and Failure Modes of Qwen3-TTS | 2026-10-16 | — | 未取详细字段 | 待核 | Qwen3-TTS 评测关联；`ti:"Qwen3-TTS"` 命中 2 条之一 |
+| 57 | `2306.00814` | Vocos: Closing the gap between time-domain and Fourier-based neural vocoders for high-quality audio synthesis | 2023-06-01 | Hubert Siuzdak | `journal_ref` 空；`comment` 空 | 国外 (Charactr) | 声码器备选；代码与权重均 MIT（见许可证矩阵 §3） |
+| 58 | `2010.14794` | Seen and Unseen emotional style transfer for voice conversion with a new emotional speech dataset | 2020-10-28 | — | `comment` = `Accepted by ICASSP 2021`（**comment 自述**） | 国内 | **ESD 数据集论文**（纠正 v0.2 猜测 ID） |
+| 59 | `2105.14762` | Emotional Voice Conversion: Theory, Databases and ESD | 2021-05-31 | — | `comment` = `Speech Communication`（**comment 自述**） | 国内 | ESD 综述/数据库论文 |
+| 60 | `1806.09514` | The Emotional Voices Database: Towards Controlling the Emotion Dimension in Voice Generation Systems | 2018-06-25 | — | `comment` = `Submitted to SLSP 2018` | 国外 (Numediart) | **EmoV-DB 论文**；其数据集 LICENSE 明确仅非商用（见许可证矩阵 §4） |
+
+### v0.3 纠错与 [MISS]
+
+- ❌ **`2111.01606` 不是 ESD 论文**：API 实际返回 `PolyTrack: Tracking with Bounding Polygons`（2021-11-02，NeurIPS 2021 MLAD Workshop）。任何文档不得再把该 ID 关联到 ESD；正确 ID 为 `2010.14794` / `2105.14762`。
+- `[MISS]` **CASIA 中文情感语料论文**：`ti:"CASIA" AND all:"corpus"` 返回 `totalResults=0`；命中条目均为 SER 方法论文，非语料本身。**标「未找到」，不猜 ID**，不计入 58 篇。
+- `[OK]` 复核一致：`2010.11567`（AISHELL-3，2020-10-22）、`2110.03370`（WenetSpeech，2021-10-07）标题与日期无误。
+
+### 发表状态降级（13 个 ID，`journal_ref` 全空）
+
+核验源：`https://export.arxiv.org/api/query?id_list=1609.03499,2006.04558,2106.06103,2210.02747,2301.02111,2403.03100,2409.00750,2503.01710,2506.21619,2509.24650,2006.11239,2206.04658,2212.04356&max_results=20`
+
+| ID | `comment` 线索 | 本版表述 |
+| --- | --- | --- |
+| `1609.03499` WaveNet | 空 | 预印本，arXiv 未记录正式发表 |
+| `2006.04558` FastSpeech 2 | `Accepted by ICLR 2021` | arXiv comment 自述 |
+| `2106.06103` VITS | `ICML 2021` | arXiv comment 自述 |
+| `2210.02747` Flow Matching | 空 | 预印本 |
+| `2301.02111` VALL-E | `Working in progress` | 未正式发表 |
+| `2403.03100` NaturalSpeech 3 | 成果描述（非会议） | 预印本 |
+| `2409.00750` MaskGCT | 空 | 预印本 |
+| `2503.01710` Spark-TTS | `Submitted to ACL 2025` | 投稿中 |
+| `2506.21619` IndexTTS2 | 空 | 预印本 |
+| `2509.24650` VoxCPM | `Technical Report` | 技术报告 |
+| `2006.11239` DDPM | 空 | 预印本（NeurIPS 2020 未经 `journal_ref` 确认） |
+| `2206.04658` BigVGAN | `To appear at ICLR 2023...` | arXiv comment 自述 |
+| `2212.04356` Whisper | 空 | 预印本 |
+
+另 4 个复核：`2406.02430` Seed-TTS（comment 空）、`2306.15687` Voicebox（`Accepted to NeurIPS 2023`）、`2309.02285` PromptTTS 2（demo page）、`2301.13662` InstructTTS（`Submit to TASLP`），`journal_ref` 同样全空。
+
+> 引用格式示例中的 `ICLR 2021` 等今后须理解为「arXiv comment 自述」。这不改变论文技术参考价值（ID/标题/日期已核验），只收紧发表状态可信度。
 
 ---
 
@@ -147,10 +192,18 @@ https://arxiv.org/abs/2006.04558
 
 ---
 
-## 待补齐（v0.3）
+## v0.3 已完成的补齐
 
-- [ ] 补齐标 `—` 条目的正式发表状态（部分为技术报告/预印本，需查会议主页）
-- [ ] Qwen3-TTS 官方技术报告 arXiv ID（本轮未取到）
-- [ ] Vocos 声码器论文 ID
-- [ ] ESD / CASIA / EmoV-DB 情感数据集论文 ID 与许可证
-- [ ] 补齐各论文 DOI / 会议主页链接（当前仅有 arXiv 与部分 comment 信息）
+- [x] Qwen3-TTS 官方技术报告 arXiv ID → `2601.15621`（另发现评测论文 `2610.23678`）
+- [x] Vocos 声码器论文 ID → `2306.00814`
+- [x] ESD 论文 ID → `2010.14794` / `2105.14762`；**纠正 `2111.01606` 误关联**
+- [x] EmoV-DB 论文 ID → `1806.09514`
+- [x] 发表状态复核 → 13 个 ID 的 `journal_ref` 全空，会议归属降级为「arXiv comment 自述」
+- [x] CASIA 语料论文 → 明确 `[MISS] 未找到`，不猜 ID
+
+## 待补齐（v0.4 / 需人工）
+
+- [ ] 13 篇论文的正式会议/期刊归属：从会议官网或 DBLP 二手核验（arXiv `journal_ref` 无法确认）
+- [ ] 各论文 DOI / 会议主页链接
+- [ ] `2610.23678` 的详细作者与 `comment` 字段
+- [ ] ESD / CASIA 数据集**官方许可证**（在线通道失败，需法务/书面确认，见方案 v0.3 §5.3.4 R-14b）

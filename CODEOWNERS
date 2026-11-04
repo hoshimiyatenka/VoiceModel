@@ -15,6 +15,9 @@
 # 参数契约与门禁（maintainer 批准 + Gate-Report）
 /configs/presets/                 @hoshimiyatenka
 /configs/eval/thresholds.yaml     @hoshimiyatenka
+/configs/voicespec/               @hoshimiyatenka
+/docs/voicespec/                  @hoshimiyatenka
+/docs/decisions/ADR-0003.md       @hoshimiyatenka
 /dicts/                           @hoshimiyatenka
 
 # 提交规范本身

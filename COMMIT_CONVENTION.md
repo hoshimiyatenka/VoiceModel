@@ -110,6 +110,7 @@ license: 改许可                        # scope 必填且受保护路径需 Li
 | --- | --- | --- |
 | `Refs:` | 关联 issue / PR / 文档 | `Refs: #42` 或 `Refs: VM-TECH-001 v0.2 §3` |
 | `Gate-Report:` | 改 `configs/eval/thresholds.yaml`、`configs/presets/**`、`dicts/**`、`docs/model-cards/**` | `Gate-Report: gs-2026-11-a` |
+| `Spec:` | 改 `configs/voicespec/**`、`docs/voicespec/**`、`scripts/validate_voicespec.py` | `Spec: voicespec@0.3.0` |
 | `Preset:` | 改 preset | `Preset: warm_companion@1.3.0` |
 | `Dataset:` | 新增/更新数据集或 manifest | `Dataset: ds-20261104-a` |
 | `Model:` | 新增/更新权重或 adapter | `Model: cv2-lora-20261104-s1200` |
@@ -130,6 +131,7 @@ license: 改许可                        # scope 必填且受保护路径需 Li
 | `datasets/golden_set/**` | **CI 校验 hash，任何改动直接失败**；仅限 `data(golden-set)` 且需 maintainer 显式批准 |
 | `configs/presets/**` | maintainer 批准 + `Gate-Report:` + `Preset:` |
 | `configs/eval/thresholds.yaml` | maintainer 批准 + `Gate-Report:`；校准只能收紧 |
+| `configs/voicespec/**` · `docs/voicespec/**` | maintainer 批准 + `Spec:` footer；契约变更须同步错误码表与 ADR-0003 |
 
 ## 7. 分支与 PR
 

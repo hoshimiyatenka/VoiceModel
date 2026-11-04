@@ -1,0 +1,14 @@
+{
+  "$schema": "../voicespec.schema.json",
+  "spec_version": "0.3.0",
+  "text": "请在三秒内完成校准。",
+  "identity": { "speaker_id": "agent_main" },
+  "prosody": {
+    "duration_mode": "exact",
+    "duration_ms": 3200,
+    "pauses": [ { "after_char_index": 6, "ms": 300 } ]
+  },
+  "style": { "emotion": "professional", "emotion_strength": 0.3 },
+  "linguistic": { "lang": "zh" },
+  "render": { "seed": 42, "watermark": true }
+}

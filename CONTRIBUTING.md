@@ -17,12 +17,16 @@
 | 文档 | 内容 |
 | --- | --- |
 | [`README.md`](README.md) | 项目入口、快速开始 |
-| [`docs/AI智能体声音训练项目_技术栈方案_v0.2.md`](docs/AI智能体声音训练项目_技术栈方案_v0.2.md) | **当前技术方案** |
+| [`docs/AI智能体声音训练项目_技术栈方案_v0.3.md`](docs/AI智能体声音训练项目_技术栈方案_v0.3.md) | **当前技术方案** |
+| [`docs/AI智能体声音训练项目_技术栈方案_v0.2.md`](docs/AI智能体声音训练项目_技术栈方案_v0.2.md) | v0.2（归档） |
 | [`docs/AI智能体声音训练项目_技术栈方案_v0.1.md`](docs/AI智能体声音训练项目_技术栈方案_v0.1.md) | 初版（归档；根目录亦保留一份） |
 | [`COMMIT_CONVENTION.md`](COMMIT_CONVENTION.md) | **★ 提交规范（必读）** |
-| [`docs/references/PAPERS.md`](docs/references/PAPERS.md) | 权威论文清单（52 篇） |
+| [`configs/voicespec/voicespec.schema.json`](configs/voicespec/voicespec.schema.json) | **★ VoiceSpec 机器可读契约** |
+| [`docs/voicespec/README.md`](docs/voicespec/README.md) | VoiceSpec 使用说明 |
+| [`docs/voicespec/ERROR-CODES.md`](docs/voicespec/ERROR-CODES.md) | 校验错误码表 |
+| [`docs/references/PAPERS.md`](docs/references/PAPERS.md) | 权威论文清单（58 篇） |
 | [`docs/licensing/UPSTREAM-LICENSE-MATRIX.md`](docs/licensing/UPSTREAM-LICENSE-MATRIX.md) | 上游许可证核验表 |
-| [`docs/decisions/ADR-0001.md`](docs/decisions/ADR-0001.md) | 许可策略决策 |
+| [`docs/decisions/ADR-0001.md`](docs/decisions/ADR-0001.md) · [`ADR-0002.md`](docs/decisions/ADR-0002.md) · [`ADR-0003.md`](docs/decisions/ADR-0003.md) | 许可 / 基座 / 控制层决策 |
 | [`configs/eval/thresholds.yaml`](configs/eval/thresholds.yaml) | 评估阈值单一真源 |
 
 ## 2. 开发环境（骨架，P0 补全）
@@ -63,7 +67,8 @@ cd VoiceModel
 ```
 [ ] 提交信息符合 COMMIT_CONVENTION.md（本地 commitlint 或 CI）
 [ ] 未提交音频实体 / checkpoint / 授权书扫描件 / .env / 密钥 / 个人信息
-[ ] 涉及 preset / 阈值 / 权重 / 数据集时填了对应 footer
+[ ] 涉及 preset / 阈值 / 权重 / 数据集 / VoiceSpec 契约时填了对应 footer
+[ ] 改 VoiceSpec 契约后跑过 `python scripts/validate_voicespec.py configs/voicespec/examples/*.json`
 [ ] 新增第三方依赖或基座已更新 UPSTREAM-LICENSE-MATRIX.md 与 NOTICE
 [ ] 方案变更已同步 docs/ 对应文档与修订记录
 [ ] 引用论文带 arXiv ID 且已加入 docs/references/PAPERS.md
@@ -80,6 +85,7 @@ cd VoiceModel
 | `datasets/golden_set/**` | CI 校验 hash，任何改动直接失败 |
 | `configs/presets/**` | maintainer 批准 + Gate-Report |
 | `configs/eval/thresholds.yaml` | maintainer 批准 + Gate-Report，校准只能收紧 |
+| `configs/voicespec/**` · `docs/voicespec/**` | maintainer 批准 + `Spec:` footer |
 
 ## 7. 行为准则
 

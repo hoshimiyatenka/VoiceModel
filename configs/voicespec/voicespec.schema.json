@@ -1,0 +1,306 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/hoshimiyatenka/VoiceModel/main/configs/voicespec/voicespec.schema.json",
+  "title": "VoiceSpec",
+  "description": "VoiceModel 参数化语音合成契约 v0.3. 五层解耦：identity/prosody/style/linguistic/render。本 schema 只做结构、类型、范围、枚举与可静态判定的依赖校验；跨字段语义冲突由 L5 控制层校验，错误码见 docs/voicespec/ERROR-CODES.md。所有未在 properties 中列出的字段一律拒绝（additionalProperties:false），防止静默忽略拼写错误。",
+  "type": "object",
+  "required": ["text", "identity"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri",
+      "description": "可选。指向本 schema，便于编辑器校验。"
+    },
+    "spec_version": {
+      "type": "string",
+      "const": "0.3.0",
+      "description": "契约版本。不兼容升级走 major；新增可选字段走 minor。必填性由控制层按 preset 合并后校验，此处允许缺省。"
+    },
+    "preset": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9][a-z0-9_-]*$",
+      "description": "引用的 preset_id。preset 是默认值集合，spec 中显式字段覆盖 preset 展开值。"
+    },
+    "preset_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$",
+      "description": "锁定 preset 版本；省略时由控制层解析为当前 production 版本并在审计日志记录实际解析值。"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 5000,
+      "description": "待合成文本。禁止内联音频二进制；SSML-like 标记（[[break:300]] 等）按 linguistic.prosody_marks 规范处理。"
+    },
+    "identity": { "$ref": "#/$defs/IdentitySpec" },
+    "prosody":  { "$ref": "#/$defs/ProsodySpec" },
+    "style":    { "$ref": "#/$defs/StyleSpec" },
+    "linguistic": { "$ref": "#/$defs/LinguisticSpec" },
+    "render":   { "$ref": "#/$defs/RenderSpec" },
+    "audit":    { "$ref": "#/$defs/AuditSpec" }
+  },
+  "$defs": {
+    "Unit01": {
+      "type": "number", "minimum": 0, "maximum": 1,
+      "description": "归一化连续量 [0,1]"
+    },
+    "Uri": {
+      "type": "string", "format": "uri", "maxLength": 2048,
+      "description": "对象存储/注册中心 URI。禁止 data: 内联二进制。"
+    },
+    "Span": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "integer", "minimum": 0, "description": "字符起始下标（含），0-based" },
+        "end":   { "type": "integer", "minimum": 1, "description": "字符结束下标（不含）" },
+        "text":  { "type": "string", "description": "可选，便于人工核对的原文片段" }
+      }
+    },
+    "F0Point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["t", "hz"],
+      "properties": {
+        "t":  { "type": "number", "minimum": 0, "maximum": 1, "description": "归一化时间位置" },
+        "hz": { "type": "number", "minimum": 0, "description": "绝对 F0(Hz)；0 表示清音/无声" }
+      }
+    },
+    "AdapterMix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "weight"],
+      "properties": {
+        "name":   { "type": "string", "minLength": 1, "maxLength": 64 },
+        "weight": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "IdentitySpec": {
+      "title": "L-A IdentitySpec 「是谁在说」",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["speaker_id"],
+      "properties": {
+        "speaker_id": { "type": "string", "minLength": 1, "maxLength": 64, "description": "注册音色 ID，指向 speaker adapter 或 embedding" },
+        "ref_audio_uri":  { "$ref": "#/$defs/Uri", "description": "零样本参考音频" },
+        "ref_text":       { "type": "string", "maxLength": 2000, "description": "参考音频转写；与 ref_audio_uri 成对给出" },
+        "speaker_lock":   { "type": "boolean", "default": true, "description": "锁定音色，禁止风格/情感参数带偏说话人" },
+        "voice_blend": {
+          "type": "array", "minItems": 2, "maxItems": 8,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["speaker_id", "weight"],
+            "properties": {
+              "speaker_id": { "type": "string", "minLength": 1, "maxLength": 64 },
+              "weight": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          },
+          "description": "多音色插值。speaker_lock=true 时禁止使用（见 E-CONFLICT-004）"
+        }
+      },
+      "allOf": [
+        {
+          "if": { "required": ["ref_text"], "properties": { "ref_text": { "minLength": 1 } } },
+          "then": { "required": ["ref_audio_uri"], "description": "ref_text 必须配套 ref_audio_uri（E-DEPENDENCY-001）" }
+        }
+      ]
+    },
+    "ProsodySpec": {
+      "title": "L-B ProsodySpec 「怎么说」连续细调主战场",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pitch_semitones":     { "type": "number", "minimum": -12, "maximum": 12, "default": 0, "description": "整体音高偏移（半音）" },
+        "pitch_range":         { "type": "number", "minimum": 0.5, "maximum": 2.0, "default": 1.0, "description": "语调起伏幅度（F0 contour 缩放）" },
+        "pitch_contour": {
+          "description": "逐字/逐音节语调。枚举档位或归一化 F0 曲线",
+          "oneOf": [
+            { "type": "string", "enum": ["native", "flat", "expressive"] },
+            { "type": "array", "minItems": 2, "maxItems": 2048, "items": { "$ref": "#/$defs/F0Point" } }
+          ]
+        },
+        "energy_db":           { "type": "number", "minimum": -6, "maximum": 6, "default": 0 },
+        "rate":                { "type": "number", "minimum": 0.5, "maximum": 2.0, "default": 1.0, "description": "全局语速；与 duration_* 互斥（E-CONFLICT-001）" },
+        "duration_mode":       { "type": "string", "enum": ["free", "exact", "range"], "default": "free" },
+        "duration_ms":         { "type": "integer", "minimum": 100, "maximum": 600000, "description": "duration_mode=exact 时必填" },
+        "duration_ratio":      { "type": "number", "minimum": 0.7, "maximum": 1.5, "description": "相对基准时长" },
+        "duration_range_ms": {
+          "type": "object", "additionalProperties": false,
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "integer", "minimum": 100 },
+            "max": { "type": "integer", "minimum": 100 }
+          },
+          "description": "duration_mode=range 时必填；须 min <= max（E-RANGE-001）"
+        },
+        "pause_profile":       { "type": "string", "enum": ["default", "news", "story", "gentle"], "default": "default" },
+        "pauses": {
+          "type": "array", "maxItems": 256,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["after_char_index", "ms"],
+            "properties": {
+              "after_char_index": { "type": "integer", "minimum": 0 },
+              "ms": { "type": "integer", "minimum": 0, "maximum": 5000 }
+            }
+          }
+        },
+        "intonation_strength": { "$ref": "#/$defs/Unit01", "default": 0.6 }
+      },
+      "allOf": [
+        {
+          "if":   { "properties": { "duration_mode": { "const": "exact" } }, "required": ["duration_mode"] },
+          "then": { "required": ["duration_ms"], "description": "E-DEPENDENCY-002" }
+        },
+        {
+          "if":   { "properties": { "duration_mode": { "const": "range" } }, "required": ["duration_mode"] },
+          "then": { "required": ["duration_range_ms"], "description": "E-DEPENDENCY-003" }
+        }
+      ],
+      "not": {
+        "description": "rate 与任何 duration 精确/区间控制不可同时显式给出（E-CONFLICT-001）",
+        "required": ["rate"],
+        "anyOf": [
+          { "required": ["duration_ms"] },
+          { "required": ["duration_ratio"] },
+          { "required": ["duration_range_ms"] },
+          { "properties": { "duration_mode": { "enum": ["exact", "range"] } }, "required": ["duration_mode"] }
+        ]
+      }
+    },
+    "StyleSpec": {
+      "title": "L-C StyleSpec 「什么状态说」",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "emotion": {
+          "type": "string",
+          "enum": ["neutral", "happy", "sad", "angry", "fear", "surprise", "tender", "professional", "tired", "excited"],
+          "default": "neutral"
+        },
+        "emotion_strength":  { "$ref": "#/$defs/Unit01", "default": 0.7 },
+        "emotion_ref_uri":   { "$ref": "#/$defs/Uri", "description": "独立情感参考（与音色参考解耦）" },
+        "style_prompt":      { "type": "string", "maxLength": 500, "description": "自然语言指令。不得单独作为 preset 的唯一控制手段（E-PRESET-001）" },
+        "scenario": {
+          "type": "string",
+          "enum": ["播报", "客服", "陪伴", "讲故事", "车载", "ASMR", "教学"],
+          "description": "场景预设，展开为一组 L-B/L-C 默认值"
+        },
+        "formality":         { "$ref": "#/$defs/Unit01", "default": 0.5 },
+        "style_adapter_mix": {
+          "type": "array", "minItems": 1, "maxItems": 8,
+          "items": { "$ref": "#/$defs/AdapterMix" }
+        },
+        "attributes":        { "$ref": "#/$defs/AttributeSpec" }
+      }
+    },
+    "AttributeSpec": {
+      "title": "L-C 补充：属性级控制（v0.2 新增候选，需过单调性测试才开放）",
+      "description": "参考 Spark-TTS arXiv:2503.01710 的 decoupled speech tokens。仅当 Phase 2 选定支持属性级控制的基座，且该属性通过 §5.6 单参数 5 点扫描（ρ>=0.90）后才允许出现在 production preset 中。",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "gender":        { "type": "string", "enum": ["unspecified", "feminine", "masculine", "neutral"] },
+        "age":           { "type": "string", "enum": ["unspecified", "child", "youth", "adult", "senior"] },
+        "pitch_class":   { "type": "string", "enum": ["unspecified", "very_low", "low", "mid", "high", "very_high"] },
+        "roughness":     { "$ref": "#/$defs/Unit01" },
+        "breathiness":   { "$ref": "#/$defs/Unit01" },
+        "vocal_tract":   { "type": "string", "maxLength": 64, "description": "保留给基座特有属性，须在模型卡登记取值范围" }
+      }
+    },
+    "LinguisticSpec": {
+      "title": "L-D LinguisticSpec 「把字念对」零容忍确定性规则层",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lang": { "type": "string", "enum": ["zh", "en", "zh-en-mix"], "default": "zh" },
+        "text_normalize": {
+          "oneOf": [
+            { "type": "boolean" },
+            { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "启用/覆盖的 TN 规则名列表" }
+          ],
+          "default": true
+        },
+        "pronunciation_dict": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "minLength": 1 },
+          "description": "词条 → 音素串；G2P 后覆写，最高优先级"
+        },
+        "phoneme_overrides": {
+          "type": "array", "maxItems": 512,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["span", "phonemes"],
+            "properties": {
+              "span": { "$ref": "#/$defs/Span" },
+              "phonemes": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "code_switch_policy": { "type": "string", "enum": ["auto", "keep_original", "transliterate"], "default": "auto" },
+        "emphasis": {
+          "type": "array", "maxItems": 256,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["span", "weight"],
+            "properties": {
+              "span": { "$ref": "#/$defs/Span" },
+              "weight": { "type": "number", "minimum": -1, "maximum": 1 }
+            }
+          }
+        },
+        "prosody_marks": {
+          "type": "array", "maxItems": 512,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["span", "level"],
+            "properties": {
+              "span": { "$ref": "#/$defs/Span" },
+              "level": { "type": "integer", "minimum": 1, "maximum": 3 }
+            }
+          }
+        }
+      }
+    },
+    "RenderSpec": {
+      "title": "L-E RenderSpec 「最后怎么送出去」",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sample_rate":     { "type": "integer", "enum": [16000, 24000, 32000, 44100, 48000], "default": 24000 },
+        "format":          { "type": "string", "enum": ["wav", "pcm_s16le", "opus", "mp3"], "default": "wav" },
+        "loudness_lufs":   { "type": "number", "minimum": -70, "maximum": 0, "default": -16 },
+        "peak_limit_dbtp": { "type": "number", "minimum": -12, "maximum": 0, "default": -1.0 },
+        "denoise":         { "type": "boolean", "default": false },
+        "dereverb":        { "type": "boolean", "default": false },
+        "post_reverb":     { "type": "string", "enum": ["none", "room_small", "room_medium", "hall", "plate"], "default": "none" },
+        "seed": {
+          "type": "integer", "minimum": 0, "maximum": 2147483647,
+          "description": "固定后同 preset/model/seed/text 须 byte-level 一致（Q9）"
+        },
+        "streaming":       { "type": "boolean", "default": false },
+        "chunk_ms":        { "type": "integer", "minimum": 20, "maximum": 2000, "default": 200 },
+        "watermark":       { "type": "boolean", "default": true, "description": "默认开启；关闭需商业授权且写审计（见 LICENSE-COMMERCIAL.md）" }
+      }
+    },
+    "AuditSpec": {
+      "title": "审计元数据（只读字段，由控制层/服务端填充；客户端传入会被拒绝）",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "request_id":        { "type": "string", "description": "全链路透传" },
+        "golden_set_passed": { "type": "string", "pattern": "^gs-[0-9]{4}-[0-9]{2}-[a-z]$" },
+        "license":           { "type": "string", "const": "PolyForm-Noncommercial-1.0.0" },
+        "model_commit":      { "type": "string" },
+        "preset_resolved":   { "type": "string" },
+        "gate_report":       { "type": "string" },
+        "watermark_id":      { "type": "string" },
+        "degraded":          { "type": "boolean", "description": "降级链是否触发（如 DSP 兜底）" }
+      }
+    }
+  }
+}

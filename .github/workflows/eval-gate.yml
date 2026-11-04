@@ -1,6 +1,7 @@
 name: eval-gate
 
-# 评估门禁骨架（Phase 0）。当前仅做结构与配置校验；
+# 评估门禁骨架（Phase 0）。当前仅做结构与配置校验 +
+# VoiceSpec 契约/示例校验（机器可执行，v0.3 起真实生效）。
 # Phase 2 起接入 src/eval/ 的 golden_set 全量合成与 Q1–Q10 门禁。
 # 阈值单一真源：configs/eval/thresholds.yaml
 
@@ -9,6 +10,9 @@ on:
     paths:
       - "configs/eval/**"
       - "configs/presets/**"
+      - "configs/voicespec/**"
+      - "scripts/validate_voicespec.py"
+      - "docs/voicespec/**"
       - "src/**"
       - "tests/regression/**"
       - "docs/model-cards/**"
@@ -16,6 +20,8 @@ on:
     branches: [main]
     paths:
       - "configs/eval/**"
+      - "configs/voicespec/**"
+      - "scripts/validate_voicespec.py"
       - "src/**"
 
 permissions:
@@ -33,7 +39,7 @@ jobs:
           python-version: "3.12"
 
       - name: 安装最小依赖
-        run: python -m pip install --quiet pyyaml
+        run: python -m pip install --quiet pyyaml -r scripts/requirements.txt
 
       - name: 校验 thresholds.yaml 结构
         run: |
@@ -54,5 +60,8 @@ jobs:
           print("提示：Phase 2 起接入 golden_set 全量合成与 Q1–Q10 自动门禁。")
           PY
 
+      - name: 校验 VoiceSpec 契约与示例（v0.3 起真实生效）
+        run: python scripts/validate_voicespec.py configs/voicespec/examples/*.json
+
       - name: 提示（未接入真实门禁）
-        run: echo "::notice::eval-gate 当前为 Phase 0 骨架，尚未运行真实合成门禁。"
+        run: echo "::notice::eval-gate 当前为 Phase 0 骨架，尚未运行真实合成门禁；VoiceSpec 契约校验已生效。"

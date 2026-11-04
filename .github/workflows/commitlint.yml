@@ -91,6 +91,9 @@ jobs:
           if printf '%s' "$changed" | grep -q '^configs/eval/thresholds.yaml$'; then
             need 'Gate-Report:' 'configs/eval/thresholds.yaml'
           fi
+          if printf '%s' "$changed" | grep -qE '^(configs/voicespec/|docs/voicespec/|scripts/validate_voicespec\.py)'; then
+            need 'Spec:' 'configs/voicespec/** / docs/voicespec/** / validate_voicespec.py'
+          fi
           if printf '%s' "$changed" | grep -q '^datasets/'; then
             need 'Dataset:' 'datasets/**'
           fi
